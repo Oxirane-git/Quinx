@@ -1,0 +1,72 @@
+# ============================================
+# Quinx AI — Root .gitignore
+# ============================================
+
+# ----- Secrets & Credentials -----
+.env
+credentials.json
+token.json
+*.pem
+*.key
+
+# ----- Python -----
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+*.whl
+
+# ----- Node.js -----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ----- Databases (contain user data) -----
+*.db
+*.sqlite
+*.sqlite3
+
+# ----- Temporary & Build Files -----
+.tmp/
+dist/
+dist-ssr/
+*.local
+
+# ----- Data Files (contain PII / leads) -----
+Leads/*.xlsx
+Emails/*.xlsx
+Email_Scrap/Leads/*.xlsx
+Email_Writer/leads/*.xlsx
+Email_Writer/emails/*.xlsx
+Email_Sender/Quinx_Warmup_Leads_Filled.xlsx
+
+# ----- OS & Editor -----
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ----- Logs -----
+logs/
+*.log
+
+# ----- Lock files for open Office files -----
+.~lock.*
+
+# ----- Playwright -----
+test-results/
+playwright-report/
+
+# ----- Build artifacts -----
+quinx-gui/frontend/dist/
