@@ -33,6 +33,15 @@ WORKFLOW_PATH = os.path.join(
     "write_email.md",
 )
 REQUIRED_FIELDS = ["businessName", "city", "category"]
+
+DEFAULT_CAMPAIGN_CONTEXT = (
+    "We help restaurants automatically follow up with customers after every visit "
+    "via WhatsApp, SMS, and email. A QR code on the table captures customer contact — "
+    "no app download needed. Automated sequences: post-visit follow-up (Day 3), "
+    "reactivation (Day 30), review generation, birthday campaigns. Setup takes 48 hours, "
+    "runs completely on autopilot after. Pricing starts at \u20b93,999/month. Website: quinxai.com"
+)
+DEFAULT_SIGN_OFF = "Sahil | Quinx AI\nquinxai.com"
 PERSONALIZATION_FIELDS = [
     "websiteSummary",
     "positiveThemes",
@@ -385,6 +394,18 @@ def main() -> None:
         default=None,
         help="Reason for retry (injected into prompt for stricter compliance)",
     )
+    parser.add_argument(
+        "--campaign-context",
+        default=None,
+        help="Free-form description of the product/service being pitched. "
+             "Defaults to the Quinx AI description if omitted.",
+    )
+    parser.add_argument(
+        "--sign-off",
+        default=None,
+        help="Email sign-off text (e.g. 'Sahil | Quinx AI\\nquinxai.com'). "
+             "Defaults to 'Sahil | Quinx AI\\nquinxai.com' if omitted.",
+    )
     args = parser.parse_args()
 
     # --- Load environment ---
@@ -422,6 +443,10 @@ def main() -> None:
         except json.JSONDecodeError as e:
             print(f"Invalid businessContext JSON: {e}", file=sys.stderr)
             sys.exit(1)
+
+    # --- Inject campaign context and sign-off ---
+    context["campaignContext"] = args.campaign_context or DEFAULT_CAMPAIGN_CONTEXT
+    context["signOff"] = args.sign_off or DEFAULT_SIGN_OFF
 
     # --- Validate inputs ---
     validate_required_fields(context)

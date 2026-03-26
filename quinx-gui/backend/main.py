@@ -60,6 +60,8 @@ class WriterRunRequest(BaseModel):
     max_tokens: int = 2048
     checkpoint_every: int = 10
     skip_low_personalization: bool = True
+    campaign_context: str = ""  # Free-form product/service description for this campaign
+    sign_off: str = ""          # Email sign-off (e.g. "Sahil | Quinx AI\nquinxai.com")
 
 class SenderRunRequest(BaseModel):
     input_file: str           # Full path to Quinx/Emails/{Name}_Emails.xlsx
@@ -152,6 +154,10 @@ async def run_writer(request: WriterRunRequest):
         "--output", output_path,
         "--start-from", str(request.range_from),
     ]
+    if request.campaign_context:
+        cmd += ["--campaign-context", request.campaign_context]
+    if request.sign_off:
+        cmd += ["--sign-off", request.sign_off]
 
     asyncio.create_task(
         process_manager.run_command(

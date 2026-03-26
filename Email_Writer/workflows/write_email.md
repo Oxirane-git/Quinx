@@ -166,15 +166,8 @@ Pain score (1–10, based on churn signals detected): {{painScore}}
 
 ---
 
-QUINX AI CONTEXT:
-- We help restaurants automatically follow up with customers after
-  every visit via WhatsApp, SMS, and email
-- QR code on the table captures customer contact — no app download needed
-- Automated sequences: post-visit follow-up (Day 3), reactivation
-  (Day 30), review generation, birthday campaigns
-- Setup takes 48 hours, runs completely on autopilot after
-- Pricing starts at ₹3,999/month
-- Website: quinxai.com
+CAMPAIGN CONTEXT:
+{{campaignContext}}
 
 ---
 
@@ -229,8 +222,8 @@ WRITING RULES — FOLLOW EVERY ONE:
      "Increase your repeat customers with Quinx AI"
      "I have a solution for you"
 
-9. SIGN-OFF: Sign as "Sahil | Quinx AI" with quinxai.com on the
-   next line. Nothing else after that.
+9. SIGN-OFF: Use exactly this sign-off: {{signOff}}
+   Nothing else after that.
 
 10. FORMAT: Return ONLY a JSON object in this exact structure.
     No explanation. No preamble. No markdown fences.
@@ -246,13 +239,13 @@ QUALITY EXAMPLES:
 Example 1 — Cafe with strong reviews, no follow-up system:
 {
   "subject": "the customers who loved Artisan Brew and never came back",
-  "body": "Hi there,\n\nLooks like Artisan Brew Co. has built something genuinely good — your reviews mention the seasonal menu and the dog-friendly setup almost every time. That's hard to build.\n\nWhat most cafes with loyal regulars miss is the first-timers. Roughly 65% of people who visit once and enjoy it never return — not because they didn't like it, but because nothing pulled them back.\n\nWe built a system that fixes this automatically — a QR code captures their contact when they visit, and a WhatsApp follow-up goes out three days later. No work on your end after setup.\n\nWorth a 10-minute call this week?\n\nSahil | Quinx AI\nquinxai.com"
+  "body": "Hi there,\n\nLooks like Artisan Brew Co. has built something genuinely good — your reviews mention the seasonal menu and the dog-friendly setup almost every time. That's hard to build.\n\nWhat most cafes with loyal regulars miss is the first-timers. Roughly 65% of people who visit once and enjoy it never return — not because they didn't like it, but because nothing pulled them back.\n\nWe built a system that fixes this automatically — a QR code captures their contact when they visit, and a WhatsApp follow-up goes out three days later. No work on your end after setup.\n\nWorth a 10-minute call this week?\n\n{{signOff}}"
 }
 
 Example 2 — Restaurant with churn signals in reviews:
 {
   "subject": "something I noticed in The Spice Garden's reviews",
-  "body": "Hi there,\n\nI was looking at The Spice Garden's Google listing — the food reviews are genuinely strong, but a few recent ones mention people saying they 'haven't been back in months' or 'keep meaning to return.' That pattern usually means one thing: no system pulling them back.\n\nMost independent restaurants in Pune lose around 60–70% of first-time customers permanently — not from bad food, just from no follow-up.\n\nWe automate that follow-up via WhatsApp. Customer visits, scans a QR, gets a message three days later. Runs itself completely.\n\nWant me to show you what this would look like for The Spice Garden specifically?\n\nSahil | Quinx AI\nquinxai.com"
+  "body": "Hi there,\n\nI was looking at The Spice Garden's Google listing — the food reviews are genuinely strong, but a few recent ones mention people saying they 'haven't been back in months' or 'keep meaning to return.' That pattern usually means one thing: no system pulling them back.\n\nMost independent restaurants in Pune lose around 60–70% of first-time customers permanently — not from bad food, just from no follow-up.\n\nWe automate that follow-up via WhatsApp. Customer visits, scans a QR, gets a message three days later. Runs itself completely.\n\nWant me to show you what this would look like for The Spice Garden specifically?\n\n{{signOff}}"
 }
 
 ---

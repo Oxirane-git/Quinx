@@ -31,7 +31,9 @@ const Writer = () => {
         temperature: 0.7,
         maxTokens: '2048',
         checkpointEvery: 10,
-        skipLowPers: true
+        skipLowPers: true,
+        campaignContext: '',
+        signOff: ''
     });
 
     const fetchLeadFiles = async () => {
@@ -63,7 +65,9 @@ const Writer = () => {
                     temperature: parseFloat(config.temperature),
                     max_tokens: parseInt(config.maxTokens, 10),
                     checkpoint_every: parseInt(config.checkpointEvery, 10),
-                    skip_low_personalization: config.skipLowPers
+                    skip_low_personalization: config.skipLowPers,
+                    campaign_context: config.campaignContext,
+                    sign_off: config.signOff
                 })
             });
             if (!res.ok) {
@@ -109,6 +113,39 @@ const Writer = () => {
 
                     {/* Scrollable form */}
                     <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+
+                        {/* Campaign Context */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[11px] font-semibold text-quinx-muted uppercase tracking-widest">
+                                Campaign Context
+                            </label>
+                            <textarea
+                                rows={4}
+                                className="w-full bg-black border border-quinx-border rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-quinx-green/60 transition-colors resize-none placeholder:text-quinx-muted/40"
+                                placeholder={"Describe your product or service...\ne.g. We offer a QR-code digital menu system for restaurants. Customers scan to view the menu and join a loyalty program. No app needed. Starts at $49/month. Website: qrmenu.com"}
+                                value={config.campaignContext}
+                                onChange={(e) => setConfig({ ...config, campaignContext: e.target.value })}
+                                disabled={running}
+                            />
+                            <p className="text-[10px] text-quinx-muted/50 leading-relaxed">
+                                Leave blank to use the default Quinx AI campaign.
+                            </p>
+                        </div>
+
+                        {/* Sign-off */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[11px] font-semibold text-quinx-muted uppercase tracking-widest">
+                                Email Sign-off
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full bg-black border border-quinx-border rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-quinx-green/60 transition-colors"
+                                placeholder="Sahil | Quinx AI  /  quinxai.com"
+                                value={config.signOff}
+                                onChange={(e) => setConfig({ ...config, signOff: e.target.value })}
+                                disabled={running}
+                            />
+                        </div>
 
                         <div className="flex flex-col space-y-1.5">
                             <div className="flex items-center justify-between">

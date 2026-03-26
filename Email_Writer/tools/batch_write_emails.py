@@ -37,6 +37,8 @@ from tools.write_email import (
     TEMPERATURE,
     MIN_WORDS,
     MAX_WORDS,
+    DEFAULT_CAMPAIGN_CONTEXT,
+    DEFAULT_SIGN_OFF,
     load_api_keys,
     load_master_prompt,
     substitute_placeholders,
@@ -333,6 +335,17 @@ def main() -> None:
         default=1,
         help="1-based lead index to start from (skip earlier leads, preserving their existing output rows)",
     )
+    parser.add_argument(
+        "--campaign-context",
+        default=None,
+        help="Free-form description of the product/service being pitched. "
+             "Defaults to the Quinx AI description if omitted.",
+    )
+    parser.add_argument(
+        "--sign-off",
+        default=None,
+        help="Email sign-off text. Defaults to 'Sahil | Quinx AI\\nquinxai.com' if omitted.",
+    )
     args = parser.parse_args()
 
     # Resolve output path
@@ -356,6 +369,10 @@ def main() -> None:
         sys.exit(1)
 
     print(f"Loaded {len(api_keys)} API key(s).", file=sys.stderr)
+
+    # Resolve campaign context and sign-off (fall back to Quinx AI defaults)
+    campaign_context = args.campaign_context or DEFAULT_CAMPAIGN_CONTEXT
+    sign_off = args.sign_off or DEFAULT_SIGN_OFF
 
     # Load master prompt template
     template = load_master_prompt()
@@ -462,6 +479,10 @@ def main() -> None:
             })
             skip_count += 1
             continue
+
+        # Inject campaign-level fields into context
+        context["campaignContext"] = campaign_context
+        context["signOff"] = sign_off
 
         # Build prompt
         prompt = substitute_placeholders(template, context)
