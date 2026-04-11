@@ -119,7 +119,9 @@ Quinx/
 │   └── frontend/            # React + Vite + Tailwind
 │       └── src/
 │           ├── App.jsx
+│           ├── api.js           # Central API base URL config
 │           ├── pages/
+│           │   ├── Campaign.jsx  # Campaign config manager
 │           │   ├── Scraper.jsx
 │           │   ├── Writer.jsx
 │           │   ├── Sender.jsx
@@ -264,12 +266,13 @@ npm run dev
 
 | Module | Description |
 |--------|-------------|
+| **⚡ Campaigns** | Create and manage campaign configs (service name, tagline, context, pricing, sender) stored as JSON |
 | **🔍 Scraper** | Configure niche, select cities, set limits, run lead scraping with live terminal output |
-| **✍️ Writer** | Load lead files, set batch parameters, run AI email generation with progress streaming |
+| **✍️ Writer** | Pick a campaign, load lead files, set batch parameters, run AI email generation with progress streaming |
 | **🚀 Sender** | Load email files, configure delays, send with pause/abort controls |
 | **📊 Logs** | View campaign history, per-lead stats, and paginated data |
 
-> **Design:** Dark hacker-dashboard aesthetic · JetBrains Mono font · Terminal green (#00ff41) accents · Real-time WebSocket streaming
+> **Design:** Dark hacker-dashboard aesthetic · JetBrains Mono font · Terminal green (#00ff88) accents · Real-time WebSocket streaming
 
 ---
 
@@ -286,7 +289,8 @@ npm run dev
 
 | Variable | Description |
 |----------|-------------|
-| `OPENROUTER_API_KEY_1` | OpenRouter API key (primary) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (primary AI provider) |
+| `OPENROUTER_API_KEY_1` | OpenRouter API key (primary fallback) |
 | `OPENROUTER_API_KEY_2` | Fallback key for rate-limit rotation |
 | `OPENROUTER_API_KEY_3` | Fallback key for rate-limit rotation |
 | `OPENROUTER_API_KEY_4` | Fallback key for rate-limit rotation |
