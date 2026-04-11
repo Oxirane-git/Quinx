@@ -276,6 +276,7 @@ npm run dev
 
 | Module | Description |
 |--------|-------------|
+| **⚡ Campaigns** | Create and manage custom campaign configs (service name, tagline, context, pricing, sender). |
 | **🔒 Auth** | JWT-based Auth (Signup / Login / Private Routes) to access isolated data. |
 | **⚡ Settings** | Connect emails (Hostinger/SMTP/Gmail OAuth). Admin sets Anthropic spend limits. |
 | **🔍 Scraper** | Configure niche, select cities, set limits, run background scraping tasks with WebSocket-streamed output. |
