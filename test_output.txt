@@ -1,0 +1,84 @@
+
+============================================================
+  1. run_pipeline.py ? Utility Functions
+============================================================
+  [PASS]  slugify()
+
+==================================================
+  Test Banner Message
+==================================================
+  [PASS]  banner() runs without error
+python : Traceback (most 
+recent call last):
+At line:1 char:1
++ python test_pipeline.py 
+--quick *>&1 | Out-File 
+test_output.txt -Enco ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Traceba  
+  ck (most recent call las   
+ t)::String) [], RemoteEx    
+ception
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  File "C:\Users\Sahil\Deskto
+p\Quinx\test_pipeline.py", 
+line 60, in test
+    print(f"  {PASS}  
+{name}")
+  File "C:\Users\Sahil\AppDat
+a\Local\Programs\Python\Pytho
+n312\Lib\encodings\cp1252.py"
+, line 19, in encode
+    return codecs.charmap_enc
+ode(input,self.errors,encodin
+g_table)[0]
+           ^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+UnicodeEncodeError: 
+'charmap' codec can't encode 
+character '\u2192' in 
+position 24: character maps 
+to <undefined>
+
+During handling of the above 
+exception, another exception 
+occurred:
+
+Traceback (most recent call 
+last):
+  File "C:\Users\Sahil\Deskto
+p\Quinx\test_pipeline.py", 
+line 699, in <module>
+    main()
+  File "C:\Users\Sahil\Deskto
+p\Quinx\test_pipeline.py", 
+line 611, in main
+    test("newest_file() 
+\u2192 None for missing",  te
+st_newest_file_returns_none_f
+or_missing)
+  File "C:\Users\Sahil\Deskto
+p\Quinx\test_pipeline.py", 
+line 67, in test
+    print(f"  {FAIL}  
+{name}")
+  File "C:\Users\Sahil\AppDat
+a\Local\Programs\Python\Pytho
+n312\Lib\encodings\cp1252.py"
+, line 19, in encode
+    return codecs.charmap_enc
+ode(input,self.errors,encodin
+g_table)[0]
+           ^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+UnicodeEncodeError: 
+'charmap' codec can't encode 
+character '\u2192' in 
+position 24: character maps 
+to <undefined>
