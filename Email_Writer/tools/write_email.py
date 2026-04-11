@@ -56,6 +56,10 @@ MODEL = "google/gemini-2.5-flash"
 TEMPERATURE = 0.7
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
+# Anthropic fallback (used when all OpenRouter keys are exhausted)
+ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
+ANTHROPIC_MODEL = "claude-haiku-4-5-20251001"  # cheapest Claude model (~$0.001/email)
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -202,6 +206,40 @@ def load_api_keys() -> list[str]:
         keys.insert(0, fallback)
 
     return keys
+
+
+def load_anthropic_key() -> str | None:
+    """Load the optional Anthropic backup API key from environment."""
+    return os.getenv("ANTHROPIC_API_KEY") or None
+
+
+def _call_anthropic_single(prompt: str, api_key: str) -> requests.Response:
+    """Make a single Anthropic Messages API call and return the raw response."""
+    headers = {
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 2048,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    return requests.post(ANTHROPIC_API_URL, headers=headers, json=payload, timeout=120)
+
+
+def _is_anthropic_rate_limit(response: requests.Response) -> bool:
+    """Check if the Anthropic response indicates a rate/quota limit."""
+    if response.status_code in (429, 529):
+        return True
+    try:
+        body = response.json()
+        error_type = body.get("error", {}).get("type", "")
+        if "rate_limit" in error_type or "overloaded" in error_type:
+            return True
+    except Exception:
+        pass
+    return False
 
 
 def _call_openrouter_single(

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { PenTool, ChevronDown, RefreshCw } from 'lucide-react';
+import { PenTool, ChevronDown, RefreshCw, Zap } from 'lucide-react';
 import TerminalLog from '../components/TerminalLog';
 import StatusCard from '../components/StatusCard';
+import { API } from '../api';
 
 const Writer = () => {
     const [running, setRunning] = useState(false);
     const [leadFiles, setLeadFiles] = useState([]);
+    const [campaigns, setCampaigns] = useState([]);
     const pollRef = useRef(null);
 
     // Poll status endpoint while running so the button re-enables after completion
@@ -13,7 +15,7 @@ const Writer = () => {
         if (running) {
             pollRef.current = setInterval(async () => {
                 try {
-                    const res = await fetch('http://localhost:8000/api/writer/status');
+                    const res = await fetch(`${API}/api/writer/status`);
                     const data = await res.json();
                     if (!data.running) {
                         setRunning(false);
@@ -26,6 +28,7 @@ const Writer = () => {
     }, [running]);
     const [config, setConfig] = useState({
         inputFile: '',       // full path from API
+        campaignName: 'quinx_ai',
         rangeFrom: 1,
         rangeTo: 9999,
         temperature: 0.7,
@@ -38,7 +41,7 @@ const Writer = () => {
 
     const fetchLeadFiles = async () => {
         try {
-            const res = await fetch('http://localhost:8000/api/leads/list');
+            const res = await fetch(`${API}/api/leads/list`);
             const data = await res.json();
             setLeadFiles(data);
             if (data.length > 0 && !config.inputFile) {
@@ -49,17 +52,26 @@ const Writer = () => {
         }
     };
 
-    useEffect(() => { fetchLeadFiles(); }, []);
+    const fetchCampaigns = async () => {
+        try {
+            const res = await fetch(`${API}/api/campaigns/list`);
+            const data = await res.json();
+            setCampaigns(Array.isArray(data) ? data : []);
+        } catch {}
+    };
+
+    useEffect(() => { fetchLeadFiles(); fetchCampaigns(); }, []);
 
     const handleRun = async () => {
         if (!config.inputFile) { alert('No lead file selected.'); return; }
         setRunning(true);
         try {
-            const res = await fetch('http://localhost:8000/api/writer/run', {
+            const res = await fetch(`${API}/api/writer/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     input_file: config.inputFile,
+                    campaign_name: config.campaignName,
                     range_from: parseInt(config.rangeFrom, 10),
                     range_to: parseInt(config.rangeTo, 10),
                     temperature: parseFloat(config.temperature),
@@ -114,37 +126,32 @@ const Writer = () => {
                     {/* Scrollable form */}
                     <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
 
-                        {/* Campaign Context */}
+                        {/* Campaign selector */}
                         <div className="flex flex-col space-y-1.5">
-                            <label className="text-[11px] font-semibold text-quinx-muted uppercase tracking-widest">
-                                Campaign Context
-                            </label>
-                            <textarea
-                                rows={4}
-                                className="w-full bg-black border border-quinx-border rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-quinx-green/60 transition-colors resize-none placeholder:text-quinx-muted/40"
-                                placeholder={"Describe your product or service...\ne.g. We offer a QR-code digital menu system for restaurants. Customers scan to view the menu and join a loyalty program. No app needed. Starts at $49/month. Website: qrmenu.com"}
-                                value={config.campaignContext}
-                                onChange={(e) => setConfig({ ...config, campaignContext: e.target.value })}
-                                disabled={running}
-                            />
-                            <p className="text-[10px] text-quinx-muted/50 leading-relaxed">
-                                Leave blank to use the default Quinx AI campaign.
-                            </p>
-                        </div>
-
-                        {/* Sign-off */}
-                        <div className="flex flex-col space-y-1.5">
-                            <label className="text-[11px] font-semibold text-quinx-muted uppercase tracking-widest">
-                                Email Sign-off
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full bg-black border border-quinx-border rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-quinx-green/60 transition-colors"
-                                placeholder="Sahil | Quinx AI  /  quinxai.com"
-                                value={config.signOff}
-                                onChange={(e) => setConfig({ ...config, signOff: e.target.value })}
-                                disabled={running}
-                            />
+                            <div className="flex items-center space-x-1.5">
+                                <Zap className="w-3 h-3 text-quinx-green" />
+                                <label className="text-[11px] font-semibold text-quinx-muted uppercase tracking-widest">
+                                    Campaign
+                                </label>
+                            </div>
+                            <div className="relative">
+                                <select
+                                    className="w-full bg-black border border-quinx-green/30 rounded-md py-2 pl-3 pr-8 text-sm text-white focus:outline-none focus:border-quinx-green/60 transition-colors appearance-none"
+                                    value={config.campaignName}
+                                    onChange={(e) => setConfig({ ...config, campaignName: e.target.value })}
+                                    disabled={running}
+                                >
+                                    {campaigns.length === 0
+                                        ? <option value="">No campaigns — create one first</option>
+                                        : campaigns.map(c => (
+                                            <option key={c.filename} value={c.filename}>
+                                                {c.campaignName || c.filename}
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-quinx-muted/60 pointer-events-none" />
+                            </div>
                         </div>
 
                         <div className="flex flex-col space-y-1.5">

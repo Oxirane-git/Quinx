@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Search, Edit3, Send, Database, Activity } from 'lucide-react';
+import { Search, Edit3, Send, Database, Activity, Zap } from 'lucide-react';
+import { API } from '../api';
 
 const Sidebar = () => {
     const [statuses, setStatuses] = useState({ scraper: false, writer: false, sender: false });
@@ -9,9 +10,9 @@ const Sidebar = () => {
     const checkStatuses = async () => {
         try {
             const [scraperRes, writerRes, senderRes] = await Promise.all([
-                fetch('http://localhost:8000/api/scraper/status').catch(() => ({ ok: false })),
-                fetch('http://localhost:8000/api/writer/status').catch(() => ({ ok: false })),
-                fetch('http://localhost:8000/api/sender/status').catch(() => ({ ok: false }))
+                fetch(`${API}/api/scraper/status`).catch(() => ({ ok: false })),
+                fetch(`${API}/api/writer/status`).catch(() => ({ ok: false })),
+                fetch(`${API}/api/sender/status`).catch(() => ({ ok: false }))
             ]);
 
             setBackendOnline(scraperRes.ok || writerRes.ok || senderRes.ok);
@@ -32,6 +33,7 @@ const Sidebar = () => {
     }, []);
 
     const navItems = [
+        { path: '/campaign', label: 'Campaigns', icon: Zap, id: 'campaign' },
         { path: '/scraper', label: 'Lead Scraper', icon: Search, id: 'scraper' },
         { path: '/writer', label: 'Email Writer', icon: Edit3, id: 'writer' },
         { path: '/sender', label: 'Email Sender', icon: Send, id: 'sender' },

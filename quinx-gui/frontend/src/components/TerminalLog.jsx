@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Copy, Trash2 } from 'lucide-react';
+import { WS } from '../api';
 
 const TerminalLog = ({ module }) => {
     const [logs, setLogs] = useState([]);
@@ -10,7 +11,7 @@ const TerminalLog = ({ module }) => {
 
     const connect = useCallback(() => {
         if (!shouldReconnect.current) return;
-        wsRef.current = new WebSocket(`ws://localhost:8000/ws/${module}`);
+        wsRef.current = new WebSocket(`${WS}/ws/${module}`);
 
         wsRef.current.onopen = () => setConnected(true);
 

@@ -1,4 +1,5 @@
 import asyncio
+import json
 import sys
 from typing import List, Optional
 from pathlib import Path
@@ -20,8 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 EMAIL_SCRAP_DIR = BASE_DIR / "Email_Scrap"
 EMAIL_WRITER_DIR = BASE_DIR / "Email_Writer"
 EMAIL_SENDER_DIR = BASE_DIR / "Email_Sender"
-LEADS_DIR = BASE_DIR / "Leads"    # Quinx/Leads/ — scraped lead XLSX files
-EMAILS_DIR = BASE_DIR / "Emails"  # Quinx/Emails/ — generated email XLSX files
+LEADS_DIR = BASE_DIR / "Leads"              # Quinx/Leads/ — scraped lead XLSX files
+EMAILS_DIR = BASE_DIR / "Emails"            # Quinx/Emails/ — generated email XLSX files
+CAMPAIGNS_DIR = EMAIL_WRITER_DIR / "campaigns"  # Quinx/Email_Writer/campaigns/
 
 # ---------------------------------------------------------------------------
 # App Initialization
@@ -60,8 +62,7 @@ class WriterRunRequest(BaseModel):
     max_tokens: int = 2048
     checkpoint_every: int = 10
     skip_low_personalization: bool = True
-    campaign_context: str = ""  # Free-form product/service description for this campaign
-    sign_off: str = ""          # Email sign-off (e.g. "Sahil | Quinx AI\nquinxai.com")
+    campaign_name: str = "quinx_ai"  # filename slug from Email_Writer/campaigns/
 
 class SenderRunRequest(BaseModel):
     input_file: str           # Full path to Quinx/Emails/{Name}_Emails.xlsx
@@ -71,6 +72,16 @@ class SenderRunRequest(BaseModel):
     retry_failed: bool = True
     retry_delay: int = 4
     send_limit: int = 0       # 0 = send all
+
+class CampaignConfig(BaseModel):
+    filename: str             # slug used as the JSON filename, e.g. "quinx_ai"
+    campaignName: str
+    serviceName: str
+    serviceTagline: str
+    serviceContext: str
+    pricing: str
+    serviceWebsite: str
+    senderName: str
 
 # ---------------------------------------------------------------------------
 # REST Endpoints: Scraper
@@ -153,6 +164,7 @@ async def run_writer(request: WriterRunRequest):
         "--input", str(request.input_file),
         "--output", output_path,
         "--start-from", str(request.range_from),
+        "--campaign", request.campaign_name,
     ]
     if request.campaign_context:
         cmd += ["--campaign-context", request.campaign_context]
@@ -243,6 +255,40 @@ def list_leads(db: Session = Depends(get_session)):
 @app.post("/api/logs/export")
 def export_logs():
     return {"message": "Export function to be implemented"}
+
+# ---------------------------------------------------------------------------
+# REST Endpoints: Campaign Config
+# ---------------------------------------------------------------------------
+
+@app.get("/api/campaigns/list")
+def list_campaign_configs():
+    """Return all campaign JSON files from Email_Writer/campaigns/."""
+    CAMPAIGNS_DIR.mkdir(parents=True, exist_ok=True)
+    campaigns = []
+    for f in sorted(CAMPAIGNS_DIR.glob("*.json")):
+        with open(f, "r", encoding="utf-8") as fp:
+            data = json.load(fp)
+        campaigns.append({"filename": f.stem, **data})
+    return campaigns
+
+@app.post("/api/campaigns/save")
+def save_campaign_config(request: CampaignConfig):
+    """Save or overwrite a campaign config JSON."""
+    CAMPAIGNS_DIR.mkdir(parents=True, exist_ok=True)
+    path = CAMPAIGNS_DIR / f"{request.filename}.json"
+    data = request.model_dump(exclude={"filename"})
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    return {"status": "saved", "filename": request.filename}
+
+@app.delete("/api/campaigns/{filename}")
+def delete_campaign_config(filename: str):
+    """Delete a campaign config JSON."""
+    path = CAMPAIGNS_DIR / f"{filename}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    path.unlink()
+    return {"status": "deleted"}
 
 # ---------------------------------------------------------------------------
 # WebSockets for Terminal Streaming

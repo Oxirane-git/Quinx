@@ -319,7 +319,8 @@ def send_emails(output_path: Path) -> None:
     headers = [c.value for c in ws[1]]
     leads = []
     for row in ws.iter_rows(min_row=2, values_only=True):
-        d = dict(zip(headers, row))
+        # Normalize keys to lowercase so both "Email" and "email" headers work
+        d = {k.lower().replace(" ", "_") if k else k: v for k, v in zip(headers, row)}
         if d.get("email") and d.get("subject") and d.get("body"):
             leads.append(d)
 

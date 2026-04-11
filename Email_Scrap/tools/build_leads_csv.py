@@ -156,8 +156,13 @@ def main():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = f".tmp/leads_{niche_slug}_{timestamp}.csv"
 
-    existing_emails = load_existing_emails(args.exclude_leads_dir)
-    print(f"[INFO] Loaded {len(existing_emails)} existing emails to exclude from '{args.exclude_leads_dir}'")
+    # When --exclude-leads-dir is __none__, skip ALL dedup (both DB and file-based)
+    if args.exclude_leads_dir == "__none__":
+        existing_emails = set()
+        print("[INFO] Skipping dedup (--fresh mode)")
+    else:
+        existing_emails = load_existing_emails(args.exclude_leads_dir)
+        print(f"[INFO] Loaded {len(existing_emails)} existing emails to exclude from '{args.exclude_leads_dir}'")
 
     print(f"[INFO] Loading enriched files for niche: '{args.niche}'")
     records = load_enriched_files(niche_slug)

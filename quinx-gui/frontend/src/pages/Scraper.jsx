@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, MapPin, Hash, FolderOpen } from 'lucide-react';
+import { API } from '../api';
 import TerminalLog from '../components/TerminalLog';
 import StatusCard from '../components/StatusCard';
 
@@ -12,7 +13,7 @@ const Scraper = () => {
         if (running) {
             pollRef.current = setInterval(async () => {
                 try {
-                    const res = await fetch('http://localhost:8000/api/scraper/status');
+                    const res = await fetch(`${API}/api/scraper/status`);
                     const data = await res.json();
                     if (!data.running) {
                         setRunning(false);
@@ -37,7 +38,7 @@ const Scraper = () => {
             const cityList = config.cities.split(',').map(s => s.trim()).filter(Boolean);
             const activeNiche = config.niche === 'Custom' ? config.customNiche : config.niche;
 
-            const res = await fetch('http://localhost:8000/api/scraper/run', {
+            const res = await fetch(`${API}/api/scraper/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

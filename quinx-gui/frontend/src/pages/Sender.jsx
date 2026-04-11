@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, XCircle, Clock, AtSign, ChevronDown, RefreshCw } from 'lucide-react';
+import { API } from '../api';
 import TerminalLog from '../components/TerminalLog';
 import StatusCard from '../components/StatusCard';
 
@@ -13,7 +14,7 @@ const Sender = () => {
         if (running) {
             pollRef.current = setInterval(async () => {
                 try {
-                    const res = await fetch('http://localhost:8000/api/sender/status');
+                    const res = await fetch(`${API}/api/sender/status`);
                     const data = await res.json();
                     if (!data.running) {
                         setRunning(false);
@@ -36,7 +37,7 @@ const Sender = () => {
 
     const fetchEmailFiles = async () => {
         try {
-            const res = await fetch('http://localhost:8000/api/emails/list');
+            const res = await fetch(`${API}/api/emails/list`);
             const data = await res.json();
             setEmailFiles(data);
             if (data.length > 0 && !config.inputFile) {
@@ -53,7 +54,7 @@ const Sender = () => {
         if (!config.inputFile) { alert('No email file selected.'); return; }
         setRunning(true);
         try {
-            const res = await fetch('http://localhost:8000/api/sender/run', {
+            const res = await fetch(`${API}/api/sender/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -80,7 +81,7 @@ const Sender = () => {
 
     const handleAbort = async () => {
         try {
-            await fetch('http://localhost:8000/api/sender/abort', { method: 'POST' });
+            await fetch(`${API}/api/sender/abort`, { method: 'POST' });
             setRunning(false);
         } catch (e) { console.error(e); }
     };

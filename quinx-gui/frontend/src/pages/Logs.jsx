@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DownloadCloud, RefreshCw, Database, ChevronDown } from 'lucide-react';
+import { API } from '../api';
 import StatusCard from '../components/StatusCard';
 
 const Logs = () => {
@@ -11,10 +12,10 @@ const Logs = () => {
     const fetchLogs = async () => {
         setLoading(true);
         try {
-            const campRes = await fetch('http://localhost:8000/api/logs/campaigns');
+            const campRes = await fetch(`${API}/api/logs/campaigns`);
             if (campRes.ok) setCampaigns(await campRes.json());
 
-            const leadRes = await fetch('http://localhost:8000/api/logs/leads');
+            const leadRes = await fetch(`${API}/api/logs/leads`);
             if (leadRes.ok) setLeads(await leadRes.json());
         } catch (e) {
             console.error("Error fetching logs", e);

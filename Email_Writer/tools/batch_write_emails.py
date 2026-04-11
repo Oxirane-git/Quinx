@@ -40,12 +40,15 @@ from tools.write_email import (
     DEFAULT_CAMPAIGN_CONTEXT,
     DEFAULT_SIGN_OFF,
     load_api_keys,
+    load_anthropic_key,
     load_master_prompt,
     substitute_placeholders,
     strip_markdown_fences,
     count_words,
     _call_openrouter_single,
     _is_rate_limit_error,
+    _call_anthropic_single,
+    _is_anthropic_rate_limit,
 )
 from tools.enrich_lead import enrich_lead
 
@@ -114,7 +117,23 @@ def read_all_leads(input_path: str = None) -> list[dict]:
     return all_leads
 
 
-def build_context(lead: dict, api_keys: list[str], key_status: dict) -> tuple[dict, bool]:
+def load_campaign_config(campaign: str | None) -> dict:
+    """Load campaign config from a JSON file. Returns empty dict if not specified."""
+    if not campaign:
+        return {}
+    if os.path.isabs(campaign) or campaign.endswith(".json"):
+        path = campaign
+    else:
+        campaigns_dir = os.path.join(BASE_DIR, "campaigns")
+        path = os.path.join(campaigns_dir, f"{campaign}.json")
+    if not os.path.exists(path):
+        print(f"Campaign config not found: {path} — service placeholders will be 'Unknown'.", file=sys.stderr)
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def build_context(lead: dict, api_keys: list[str], key_status: dict, campaign_config: dict | None = None) -> tuple[dict, bool]:
     """Build a businessContext dict, enriched with scraped website data."""
     enrichment, all_exhausted = enrich_lead(lead, api_keys, key_status)
     business_name = lead.get("business_name", "")
@@ -138,6 +157,11 @@ def build_context(lead: dict, api_keys: list[str], key_status: dict) -> tuple[di
         "recentMentions": enrichment.get("recentMentions", "Unknown"),
         "painScore": enrichment.get("painScore", "6"),
     }
+    # Merge campaign config (serviceName, serviceContext, senderName, etc.)
+    if campaign_config:
+        for key, value in campaign_config.items():
+            if key not in context:  # never overwrite lead-specific fields
+                context[key] = value
     return context, all_exhausted
 
 
@@ -164,19 +188,48 @@ def validate_email_output(result: dict, context: dict) -> str | None:
     return None
 
 
+def _parse_anthropic_response(response: requests.Response, key_label: str) -> dict | None:
+    """Parse a successful Anthropic API response into a result dict. Returns None on failure."""
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        print(f"  {key_label}: Invalid JSON response.", file=sys.stderr)
+        return None
+
+    raw_text = data.get("content", [{}])[0].get("text", "")
+    if not raw_text:
+        print(f"  {key_label}: Empty response content.", file=sys.stderr)
+        return None
+
+    cleaned = strip_markdown_fences(raw_text)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        json_match = re.search(r"\{[^{}]*\}", cleaned, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                pass
+        print(f"  {key_label}: No JSON found in response.", file=sys.stderr)
+        return None
+
+
 def call_api_with_rotation(
     prompt: str,
     api_keys: list[str],
     key_status: dict,
     retry_reason: str | None = None,
+    anthropic_key: str | None = None,
 ) -> tuple[dict | None, str | None, bool]:
     """
-    Call OpenRouter API with key rotation.
+    Call OpenRouter API with key rotation. Falls back to Anthropic if all
+    OpenRouter keys are exhausted and anthropic_key is provided.
 
     Returns: (result_dict, error_string, all_keys_exhausted)
     - result_dict: parsed JSON if successful, None on failure
     - error_string: error description if failed
-    - all_keys_exhausted: True if ALL keys hit rate limits (should stop batch)
+    - all_keys_exhausted: True if ALL keys (incl. Anthropic) exhausted
     """
     full_prompt = prompt
     if retry_reason:
@@ -272,9 +325,34 @@ def call_api_with_rotation(
         print(f"  {key_label}: Success!", file=sys.stderr)
         return result, None, False
 
-    # Check if ALL keys are exhausted
-    all_exhausted = exhausted_count >= len(api_keys)
-    return None, "All keys tried, none succeeded.", all_exhausted
+    # All OpenRouter keys exhausted — try Anthropic backup if available
+    all_openrouter_exhausted = exhausted_count >= len(api_keys)
+    if all_openrouter_exhausted and anthropic_key:
+        print("  [Backup] All OpenRouter keys exhausted. Trying Anthropic...", file=sys.stderr)
+        try:
+            response = _call_anthropic_single(full_prompt, anthropic_key)
+            if _is_anthropic_rate_limit(response):
+                print(
+                    f"  [Backup] Anthropic rate limited (HTTP {response.status_code}).",
+                    file=sys.stderr,
+                )
+                return None, "Anthropic rate limited.", True
+            if response.status_code != 200:
+                print(
+                    f"  [Backup] Anthropic HTTP {response.status_code}: {response.text[:200]}",
+                    file=sys.stderr,
+                )
+                return None, f"Anthropic HTTP {response.status_code}", True
+            result = _parse_anthropic_response(response, "[Backup] Anthropic")
+            if result:
+                print("  [Backup] Anthropic: Success!", file=sys.stderr)
+                return result, None, False
+            return None, "Anthropic returned no parseable JSON.", True
+        except Exception as e:
+            print(f"  [Backup] Anthropic error: {e}", file=sys.stderr)
+            return None, f"Anthropic error: {e}", True
+
+    return None, "All keys tried, none succeeded.", all_openrouter_exhausted
 
 
 def save_output(results: list[dict], output_path: str) -> None:
@@ -336,15 +414,9 @@ def main() -> None:
         help="1-based lead index to start from (skip earlier leads, preserving their existing output rows)",
     )
     parser.add_argument(
-        "--campaign-context",
+        "--campaign",
         default=None,
-        help="Free-form description of the product/service being pitched. "
-             "Defaults to the Quinx AI description if omitted.",
-    )
-    parser.add_argument(
-        "--sign-off",
-        default=None,
-        help="Email sign-off text. Defaults to 'Sahil | Quinx AI\\nquinxai.com' if omitted.",
+        help="Campaign config name (e.g. 'quinx_ai') or full path to a campaign JSON file.",
     )
     args = parser.parse_args()
 
@@ -368,7 +440,18 @@ def main() -> None:
         print("No OpenRouter API keys found in .env.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Loaded {len(api_keys)} API key(s).", file=sys.stderr)
+    anthropic_key = load_anthropic_key()
+    if anthropic_key:
+        print(f"Loaded {len(api_keys)} OpenRouter key(s) + Anthropic backup.", file=sys.stderr)
+    else:
+        print(f"Loaded {len(api_keys)} API key(s).", file=sys.stderr)
+
+    # Load campaign config
+    campaign_config = load_campaign_config(args.campaign)
+    if campaign_config:
+        print(f"Campaign: {campaign_config.get('campaignName', args.campaign)}", file=sys.stderr)
+    else:
+        print("No campaign config loaded — service placeholders will be 'Unknown'.", file=sys.stderr)
 
     # Resolve campaign context and sign-off (fall back to Quinx AI defaults)
     campaign_context = args.campaign_context or DEFAULT_CAMPAIGN_CONTEXT
@@ -419,7 +502,7 @@ def main() -> None:
         )
 
         # Build context (enriches lead with scraped website data)
-        context, enrichment_exhausted = build_context(lead, api_keys, key_status)
+        context, enrichment_exhausted = build_context(lead, api_keys, key_status, campaign_config)
 
         if enrichment_exhausted:
             print(
@@ -489,7 +572,7 @@ def main() -> None:
 
         # First attempt
         result, error, all_exhausted = call_api_with_rotation(
-            prompt, api_keys, key_status
+            prompt, api_keys, key_status, anthropic_key=anthropic_key
         )
 
         if all_exhausted:
@@ -543,7 +626,8 @@ def main() -> None:
                 # Retry with reason
                 time.sleep(DELAY_BETWEEN_CALLS)
                 result2, error2, all_exhausted2 = call_api_with_rotation(
-                    prompt, api_keys, key_status, retry_reason=validation_error
+                    prompt, api_keys, key_status, retry_reason=validation_error,
+                    anthropic_key=anthropic_key,
                 )
 
                 if all_exhausted2:
