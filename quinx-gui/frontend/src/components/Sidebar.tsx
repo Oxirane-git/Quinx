@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Target, Pencil, Send, Database, Settings, LogOut } from 'lucide-react';
+import { Target, Pencil, Send, Database, Settings, LogOut, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { api } from '../lib/api';
@@ -26,6 +26,7 @@ export default function Sidebar() {
   { name: '2. Write', path: '/writer', icon: Pencil },
   { name: '3. Send', path: '/sender', icon: Send },
   { name: '4. Logs', path: '/logs', icon: Database },
+  { name: '5. Campaigns', path: '/campaign', icon: Zap },
  ];
 
  const handleLogout = () => {

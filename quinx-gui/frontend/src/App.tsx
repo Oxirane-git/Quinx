@@ -6,6 +6,7 @@ import Scraper from './pages/Scraper';
 import Writer from './pages/Writer';
 import Sender from './pages/Sender';
 import Logs from './pages/Logs';
+import Campaign from './pages/Campaign';
 
 function App() {
  const token = localStorage.getItem('token');
@@ -22,6 +23,7 @@ function App() {
      <Routes>
       <Route path="/" element={<Navigate to="/scraper" />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/campaign" element={<Campaign />} />
       <Route path="/scraper" element={<Scraper />} />
       <Route path="/writer" element={<Writer />} />
       <Route path="/sender" element={<Sender />} />
