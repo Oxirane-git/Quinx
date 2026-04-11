@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="quinx-saas/frontend/src/assets/hero.png" alt="Quinx AI SaaS Dashboard" width="700"/>
+  <img src="quinx-gui/frontend/src/assets/hero.png" alt="Quinx AI GUI Dashboard" width="700"/>
 </p>
 
-<h1 align="center">Quinx AI SaaS</h1>
+<h1 align="center">Quinx AI</h1>
 
 <p align="center">
-  <strong>End-to-end cold email outreach automation — from lead scraping to inbox delivery. Now built as a Multi-Tenant SaaS platform.</strong>
+  <strong>End-to-end cold email outreach automation — from lead scraping to inbox delivery.</strong>
 </p>
 
 <p align="center">
@@ -20,14 +20,14 @@
 
 ## 🎯 What is Quinx?
 
-**Quinx AI** is a four-stage automation pipeline that handles the entire cold outreach lifecycle. In its fully-hosted SaaS form, it provides complete manual control while ensuring data isolation and task delegation:
+**Quinx AI** is a four-stage automation pipeline that handles the entire cold outreach lifecycle:
 
 1. **🔍 Scrape** — Find businesses on Google Maps, extract emails from their websites
-2. **✍️ Write** — Generate hyper-personalized cold emails using AI (Gemini 2.5 Flash / OpenRouter)
+2. **✍️ Write** — Generate hyper-personalized cold emails using AI (Gemini 2.5 Flash)
 3. **🚀 Send** — Deliver emails via SMTP with human-like delays and IMAP Sent-folder sync
-4. **📊 Log** — Track every campaign, lead, and email safely in the database
+4. **📊 Log** — Track every campaign, lead, and email in a local SQLite database
 
-All stages can be run individually or seamlessly controlled through a beautiful, terminal-inspired **SaaS Control Panel**.
+All stages can be run individually, sequentially via a master CLI, or controlled through a beautiful **GUI dashboard**.
 
 ---
 
@@ -111,26 +111,25 @@ Quinx/
 │   └── .env.example
 ├── Leads/                   # Consolidated lead XLSX files
 ├── Emails/                  # Final email XLSX files
-├── quinx-saas/              # 🖥️ SaaS Control Panel (Multi-Tenant)
-│   ├── backend/             # FastAPI + SQLModel + Celery
+├── quinx-gui/               # 🖥️ GUI Control Panel
+│   ├── backend/             # FastAPI + SQLModel
 │   │   ├── main.py
-│   │   ├── core/            # Config, Security, Celery tasks, Database integration
-│   │   ├── api/             # API Router Endpoints
-│   │   └── requirements.txt
-│   └── frontend/            # React 19 + Vite + Tailwind CSS
+│   │   ├── database.py
+│   │   └── runner.py
+│   └── frontend/            # React + Vite + Tailwind
 │       └── src/
-│           ├── App.tsx
-│           ├── lib/api.ts   # Central API client
+│           ├── App.jsx
+│           ├── api.js           # Central API base URL config
 │           ├── pages/
-│           │   ├── Auth.tsx      # Login & Signup
-│           │   ├── Campaign.tsx  # Campaign config manager
-│           │   ├── Scraper.tsx
-│           │   ├── Writer.tsx
-│           │   ├── Sender.tsx
-│           │   └── Logs.tsx
+│           │   ├── Campaign.jsx  # Campaign config manager
+│           │   ├── Scraper.jsx
+│           │   ├── Writer.jsx
+│           │   ├── Sender.jsx
+│           │   └── Logs.jsx
 │           └── components/
-│               ├── Sidebar.tsx
-│               └── ...
+│               ├── Sidebar.jsx
+│               ├── StatusCard.jsx
+│               └── TerminalLog.jsx
 └── docs/                    # Documentation assets
 ```
 
@@ -227,23 +226,19 @@ python run_pipeline.py --send-only "Email_Writer/emails/email_output_10chunks.xl
 
 ---
 
-## 🖥️ SaaS Control Panel
+## 🖥️ GUI Control Panel
 
-The Quinx SaaS module provides a full-stack dashboard to manage all pipeline stages online efficiently and multi-tenant without touching the CLI.
+The Quinx GUI provides a visual "mission control" dashboard to manage all pipeline stages without touching the CLI.
 
 ### Setup
 
 ```bash
 # Backend
-cd quinx-saas/backend
+cd quinx-gui/backend
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # macOS/Linux
-pip install -r requirements.txt
-
-# Redis (Required for Celery Background Tasks)
-# Ensure you have Redis running on your system or via Docker:
-# docker run -p 6379:6379 -d redis
+pip install fastapi uvicorn sqlmodel pydantic openpyxl
 
 # Frontend
 cd ../frontend
@@ -252,37 +247,30 @@ npm install
 
 ### Running
 
-Open **three terminals**:
+Open **two terminals**:
 
 ```bash
 # Terminal 1 — Backend (FastAPI)
-cd quinx-saas/backend
+cd quinx-gui/backend
 venv\Scripts\activate
 uvicorn main:app --reload
 # → http://localhost:8000 (API docs at /docs)
 
-# Terminal 2 — Background Worker (Celery)
-cd quinx-saas/backend
-venv\Scripts\activate
-celery -A core.celery_app worker --loglevel=info
-
-# Terminal 3 — Frontend (React + Vite)
-cd quinx-saas/frontend
+# Terminal 2 — Frontend (React + Vite)
+cd quinx-gui/frontend
 npm run dev
 # → http://localhost:5173
 ```
 
-### SaaS Features
+### GUI Features
 
 | Module | Description |
 |--------|-------------|
-| **⚡ Campaigns** | Create and manage custom campaign configs (service name, tagline, context, pricing, sender). |
-| **🔒 Auth** | JWT-based Auth (Signup / Login / Private Routes) to access isolated data. |
-| **⚡ Settings** | Connect emails (Hostinger/SMTP/Gmail OAuth). Admin sets Anthropic spend limits. |
-| **🔍 Scraper** | Configure niche, select cities, set limits, run background scraping tasks with WebSocket-streamed output. |
-| **✍️ Writer** | Load campaigns, set config, calculate token costs & limits, and send AI email generation task to Celery. |
-| **🚀 Sender** | Configure accounts & delays, dispatch email workloads securely without blocking the FastApi server. |
-| **📊 Logs** | Live stats tracking, full paginated table with scraped/written/sent statuses crossing, and XLSX export. |
+| **⚡ Campaigns** | Create and manage campaign configs (service name, tagline, context, pricing, sender) stored as JSON |
+| **🔍 Scraper** | Configure niche, select cities, set limits, run lead scraping with live terminal output |
+| **✍️ Writer** | Pick a campaign, load lead files, set batch parameters, run AI email generation with progress streaming |
+| **🚀 Sender** | Load email files, configure delays, send with pause/abort controls |
+| **📊 Logs** | View campaign history, per-lead stats, and paginated data |
 
 > **Design:** Dark hacker-dashboard aesthetic · JetBrains Mono font · Terminal green (#00ff88) accents · Real-time WebSocket streaming
 
@@ -348,12 +336,12 @@ The AI email writer enforces strict rules to ensure high deliverability and enga
 
 ## 🗄️ Database
 
-Quinx SaaS handles complete data isolation (all rows keyed by `user_id`):
+Quinx uses **SQLite** for zero-config data persistence:
 
 | Database | Location | Purpose |
 |----------|----------|---------|
-| `leads.db` | Project root | Master CLI lead database |
-| `quinx_saas.db` | `quinx-saas/backend/` | PostgreSQL or local SQLite for SaaS Platform (Auth, Campaigns, Accounts) |
+| `leads.db` | Project root | Master lead database (all scraped data) |
+| `quinx_campaigns.db` | `quinx-gui/backend/` | GUI campaign tracking |
 
 ---
 
@@ -385,9 +373,10 @@ New York, Los Angeles, Chicago, Toronto, Miami, Houston, Vancouver, Atlanta, Lon
 | **Lead Scraping** | Python, Google Maps Places API, BeautifulSoup, Regex |
 | **Email Writing** | Python, Gemini 2.5 Flash (OpenRouter), openpyxl |
 | **Email Sending** | Node.js, SMTP (Hostinger), IMAP, Playwright |
-| **Task Queue** | Celery + Redis |
-| **SaaS Backend** | FastAPI, SQLModel (PostgreSQL/SQLite), WebSockets, JWT Auth |
-| **SaaS Frontend** | React 19, Vite, Tailwind CSS, React Router |
+| **Master Pipeline** | Python, argparse, subprocess |
+| **GUI Backend** | FastAPI, SQLModel, WebSockets, asyncio |
+| **GUI Frontend** | React 19, Vite, Tailwind CSS, React Router |
+| **Database** | SQLite |
 
 ---
 
