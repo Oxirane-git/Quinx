@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 
 interface Campaign { id: number; name: string; niche: string; }
-interface EmailAccount { id: number; provider: string; credentials_json: string; }
+interface EmailAccount { id: number; provider: string; email: string; host: string; port: string; }
 
 export default function Sender() {
  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -14,35 +14,29 @@ export default function Sender() {
  const [fromLead, setFromLead] = useState(0);
  const [toLead, setToLead] = useState(100);
  const [running, setRunning] = useState(false);
- const [logs, setLogs] = useState<string[]>([]);
+ const [jobId, setJobId] = useState<string | null>(null);
+ const [log, setLog] = useState('');
  const [error, setError] = useState('');
  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
  const logEndRef = useRef<HTMLDivElement>(null);
 
  useEffect(() => {
-  api.get('/api/campaigns').then(setCampaigns).catch(() => {});
+  api.get('/api/campaigns/').then(setCampaigns).catch(() => {});
   api.get('/api/users/settings/email-accounts').then(setAccounts).catch(() => {});
   return () => { if (pollRef.current) clearInterval(pollRef.current); };
  }, []);
 
  useEffect(() => {
   logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
- }, [logs]);
+ }, [log]);
 
- const appendLog = (line: string) => setLogs(prev => [...prev, line]);
-
- const accountLabel = (acc: EmailAccount) => {
-  try {
-   const creds = JSON.parse(acc.credentials_json);
-   return `${creds.email || acc.provider} (${acc.provider})`;
-  } catch { return acc.provider; }
- };
+ const accountLabel = (acc: EmailAccount) => `${acc.email || '—'} (${acc.provider})`;
 
  const handleDispatch = async () => {
   if (!campaignId || !accountId) { setError('Select a campaign and email account.'); return; }
   setError('');
   setRunning(true);
-  setLogs(['[SYSTEM] Initiating dispatch sequence...']);
+  setLog('[SYSTEM] Initiating dispatch sequence...');
   try {
    const { job_id } = await api.post('/api/sender/start-task', {
     campaign_id: campaignId,
@@ -52,37 +46,48 @@ export default function Sender() {
     min_delay: minDelay,
     max_delay: maxDelay,
    });
-   appendLog(`[INFO] Task queued — Job ID: ${job_id}`);
+   setJobId(job_id);
 
    pollRef.current = setInterval(async () => {
     try {
      const status = await api.get(`/api/campaigns/task/${job_id}/status`);
-     appendLog(`[RELAY] Status: ${status.status}`);
+     if (status.log) setLog(status.log);
      if (status.status === 'SUCCESS') {
-      appendLog(`[SYSTEM] Dispatch complete. ${JSON.stringify(status.result)}`);
+      setLog(prev => prev + '\n[SYSTEM] Dispatch complete.');
       clearInterval(pollRef.current!);
       setRunning(false);
+      setJobId(null);
      } else if (status.status === 'FAILURE') {
-      appendLog('[ERROR] Dispatch task failed.');
+      setLog(prev => prev + `\n[ERROR] ${status.result?.error || 'Dispatch task failed.'}`);
       clearInterval(pollRef.current!);
       setRunning(false);
+      setJobId(null);
+     } else if (status.status === 'CANCELLED') {
+      clearInterval(pollRef.current!);
+      setRunning(false);
+      setJobId(null);
      }
     } catch {
-     appendLog('[ERROR] Lost contact with relay.');
+     setLog(prev => prev + '\n[ERROR] Lost contact with relay.');
      clearInterval(pollRef.current!);
      setRunning(false);
+     setJobId(null);
     }
    }, 2000);
   } catch (err: unknown) {
-   appendLog(`[ERROR] ${err instanceof Error ? err.message : 'Failed to start dispatch'}`);
+   setLog(`[ERROR] ${err instanceof Error ? err.message : 'Failed to start dispatch'}`);
    setRunning(false);
   }
  };
 
- const handleAbort = () => {
+ const handleAbort = async () => {
   if (pollRef.current) clearInterval(pollRef.current);
-  appendLog('[SYSTEM] Transmission aborted by operator.');
+  if (jobId) {
+   await api.post(`/api/sender/stop-task/${jobId}`, {}).catch(() => {});
+  }
+  setLog(prev => prev + '\n[SYSTEM] Transmission aborted by operator.');
   setRunning(false);
+  setJobId(null);
  };
 
  return (
@@ -158,12 +163,11 @@ export default function Sender() {
      <span className="text-textMuted">RELAY_LOG // {running ? 'ACTIVE' : 'IDLE'}</span>
      <span className={`w-3 h-3 rounded-full ${running ? 'bg-primary animate-pulse' : 'bg-slate-200'}`}></span>
     </div>
-    <div className="flex-1 p-4 overflow-y-auto text-sm text-textMain text-sm space-y-1">
-     {logs.length === 0 ? (
+    <div className="flex-1 p-4 overflow-y-auto font-mono text-xs text-textMain space-y-0.5">
+     {!log ? (
       <span className="text-textMuted italic">No active dispatch routines...</span>
-     ) : logs.map((l, i) => (
-      <div key={i} className={l.includes('ERROR') ? 'text-red-400' : l.includes('[INFO]') || l.includes('complete') ? 'text-primary' : l.includes('SYSTEM') ? 'text-blue-400' : ''}>
-       <span className="text-textMuted mr-2">{new Date().toISOString().split('T')[1].substring(0, 8)}</span>
+     ) : log.split('\n').map((l, i) => (
+      <div key={i} className={l.includes('ERROR') ? 'text-red-400' : l.includes('complete') || l.includes('Success') ? 'text-primary' : l.includes('SYSTEM') ? 'text-blue-400' : ''}>
        {l}
       </div>
      ))}

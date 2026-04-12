@@ -16,6 +16,11 @@ export default {
         textMuted: '#64748b', // slate-500
         danger: '#ef4444', // red-500
         success: '#10b981', // emerald-500
+        // Quinx dark theme (Campaign page)
+        'quinx-surface': '#0d1117',
+        'quinx-border': '#21262d',
+        'quinx-green': '#00ff88',
+        'quinx-muted': '#8b949e',
       },
       fontFamily: {
         sans: ['"Inter"', 'sans-serif'],

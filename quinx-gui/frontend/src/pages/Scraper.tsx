@@ -10,6 +10,7 @@ export default function Scraper() {
  const [campaignName, setCampaignName] = useState('');
  const [downloadId, setDownloadId] = useState<number | null>(null);
  const [downloadName, setDownloadName] = useState('');
+ const [currentJobId, setCurrentJobId] = useState<string | null>(null);
  const logEndRef = useRef<HTMLDivElement>(null);
  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -32,23 +33,38 @@ export default function Scraper() {
     campaign_name: name,
    });
 
+   setCurrentJobId(job_id);
    appendLog(`[INFO] Task queued — Job ID: ${job_id}`);
 
    pollRef.current = setInterval(async () => {
     try {
      const status = await api.get(`/api/campaigns/task/${job_id}/status`);
-     appendLog(`[WORKER] Status: ${status.status}`);
+
+     if (status.log) {
+      const lines = status.log.split('\n').filter(Boolean);
+      setLogs(prev => {
+       const base = prev.filter(l => !l.startsWith('[PIPELINE]'));
+       return [...base, ...lines.map((l: string) => `[PIPELINE] ${l}`)];
+      });
+     }
 
      if (status.status === 'SUCCESS') {
       appendLog(`[SYSTEM] Task complete. ${JSON.stringify(status.result)}`);
       clearInterval(pollRef.current!);
       setIsRunning(false);
+      setCurrentJobId(null);
       setDownloadId(campaign_id);
       setDownloadName(name);
      } else if (status.status === 'FAILURE') {
       appendLog(`[ERROR] Task failed.`);
       clearInterval(pollRef.current!);
       setIsRunning(false);
+      setCurrentJobId(null);
+     } else if (status.status === 'CANCELLED') {
+      appendLog(`[SYSTEM] Task cancelled.`);
+      clearInterval(pollRef.current!);
+      setIsRunning(false);
+      setCurrentJobId(null);
      }
     } catch {
      appendLog('[ERROR] Failed to poll task status.');
@@ -59,6 +75,16 @@ export default function Scraper() {
   } catch (err: unknown) {
    appendLog(`[ERROR] ${err instanceof Error ? err.message : 'Failed to start task'}`);
    setIsRunning(false);
+  }
+ };
+
+ const stopScrape = async () => {
+  if (!currentJobId) return;
+  try {
+   await api.post(`/api/scraper/stop-task/${currentJobId}`, {});
+   appendLog('[SYSTEM] Stop signal sent...');
+  } catch {
+   appendLog('[ERROR] Failed to send stop signal.');
   }
  };
 
@@ -120,13 +146,24 @@ export default function Scraper() {
        className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain"
       />
      </div>
-     <button
-      disabled={isRunning}
-      type="submit"
-      className="w-full py-3 mt-4 border text-sm font-bold bg-surface transition-colors bg-primary/10 border-primary/20 text-primary hover:bg-primaryHover hover:text-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed shadow"
-     >
-      {isRunning ? 'RUNTIME_ACTIVE' : 'DEPLOY_SPIDERS'}
-     </button>
+     <div className="flex gap-2 mt-4">
+      <button
+       disabled={isRunning}
+       type="submit"
+       className="flex-1 py-3 border text-sm font-bold bg-surface transition-colors bg-primary/10 border-primary/20 text-primary hover:bg-primaryHover hover:text-white disabled:opacity-50 disabled:cursor-not-allowed shadow"
+      >
+       {isRunning ? 'RUNTIME_ACTIVE' : 'DEPLOY_SPIDERS'}
+      </button>
+      {isRunning && (
+       <button
+        type="button"
+        onClick={stopScrape}
+        className="px-4 py-3 border text-sm font-bold border-danger/40 text-danger bg-danger/10 hover:bg-danger hover:text-white transition-colors shadow"
+       >
+        STOP
+       </button>
+      )}
+     </div>
 
      {downloadId && (
       <button

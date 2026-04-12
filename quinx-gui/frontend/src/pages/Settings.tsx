@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
-interface EmailAccount { id: number; provider: string; credentials_json: string; }
+interface EmailAccount { id: number; provider: string; email: string; host: string; port: string; }
 interface UserMe { balance: number; api_limit: number; }
 
 export default function Settings() {
@@ -22,12 +22,7 @@ export default function Settings() {
 
  useEffect(() => { loadData(); }, []);
 
- const accountLabel = (acc: EmailAccount) => {
-  try {
-   const creds = JSON.parse(acc.credentials_json);
-   return `${creds.email || '—'} via ${acc.provider}`;
-  } catch { return acc.provider; }
- };
+ const accountLabel = (acc: EmailAccount) => `${acc.email || '—'} via ${acc.provider}`;
 
  const handleSmtpSave = async (e: React.SyntheticEvent<HTMLFormElement>) => {
   e.preventDefault();
@@ -82,13 +77,13 @@ export default function Settings() {
      <div className="flex gap-4 mb-4">
       <button
        onClick={() => setProvider('smtp')}
-       className={`px-4 py-2 text-sm border ${provider === 'smtp' ? 'border-primary text-primary bg-primary/5 text-primary bg-primary/5' : 'border-border text-textMuted hover:text-textMain'}`}
+       className={`px-4 py-2 text-sm border ${provider === 'smtp' ? 'border-primary text-primary bg-primary/5' : 'border-border text-textMuted hover:text-textMain'}`}
       >
        HOSTINGER / IMAP
       </button>
       <button
        onClick={() => setProvider('gmail')}
-       className={`px-4 py-2 text-sm border ${provider === 'gmail' ? 'border-primary text-primary bg-primary/5 text-primary bg-primary/5' : 'border-border text-textMuted hover:text-textMain'}`}
+       className={`px-4 py-2 text-sm border ${provider === 'gmail' ? 'border-primary text-primary bg-primary/5' : 'border-border text-textMuted hover:text-textMain'}`}
       >
        GOOGLE OAUTH
       </button>
@@ -100,7 +95,7 @@ export default function Settings() {
        <input type="number" value={port} onChange={e => setPort(e.target.value)} placeholder="Port (e.g. 465)" required className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email Address" required className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
        <input type="password" value={appPassword} onChange={e => setAppPassword(e.target.value)} placeholder="App Password" required className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
-       {saveMsg && <p className={`text-xs px-3 py-2 border ${saveMsg.includes('saved') ? 'text-primary border-primary text-primary bg-primary/5/30 bg-primary/5' : 'text-red-400 border-red-900/50 bg-red-900/10'}`}>{saveMsg}</p>}
+       {saveMsg && <p className={`text-xs px-3 py-2 border ${saveMsg.includes('saved') ? 'text-primary border-primary bg-primary/5' : 'text-red-400 border-red-900/50 bg-red-900/10'}`}>{saveMsg}</p>}
        <button type="submit" disabled={saving} className="bg-slate-100 hover:bg-primary/20 hover:text-primary border border-border hover:border-primary p-2 w-full text-sm font-bold transition-colors disabled:opacity-50">
         {saving ? 'SAVING...' : 'ADD SMTP CONNECTION'}
        </button>

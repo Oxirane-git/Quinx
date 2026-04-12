@@ -453,9 +453,9 @@ def main() -> None:
     else:
         print("No campaign config loaded — service placeholders will be 'Unknown'.", file=sys.stderr)
 
-    # Resolve campaign context and sign-off (fall back to Quinx AI defaults)
-    campaign_context = args.campaign_context or DEFAULT_CAMPAIGN_CONTEXT
-    sign_off = args.sign_off or DEFAULT_SIGN_OFF
+    # Resolve campaign context and sign-off from config or fall back to defaults
+    campaign_context = campaign_config.get('serviceContext', '') or DEFAULT_CAMPAIGN_CONTEXT
+    sign_off = campaign_config.get('signOff', '') or DEFAULT_SIGN_OFF
 
     # Load master prompt template
     template = load_master_prompt()

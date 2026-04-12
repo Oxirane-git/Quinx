@@ -15,11 +15,17 @@ import argparse
 import json
 import os
 import re
+import sys
 import time
 from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 REQUEST_TIMEOUT = 10
 INTER_RECORD_DELAY = 1.2  # seconds between records

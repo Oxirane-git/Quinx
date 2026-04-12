@@ -22,11 +22,11 @@ export default function Sidebar() {
  }, []);
 
  const nav = [
-  { name: '1. Scrape', path: '/scraper', icon: Target },
-  { name: '2. Write', path: '/writer', icon: Pencil },
-  { name: '3. Send', path: '/sender', icon: Send },
-  { name: '4. Logs', path: '/logs', icon: Database },
-  { name: '5. Campaigns', path: '/campaign', icon: Zap },
+  { name: '1. Campaign', path: '/campaign', icon: Zap },
+  { name: '2. Scrape', path: '/scraper', icon: Target },
+  { name: '3. Write', path: '/writer', icon: Pencil },
+  { name: '4. Send', path: '/sender', icon: Send },
+  { name: '5. Logs', path: '/logs', icon: Database },
  ];
 
  const handleLogout = () => {

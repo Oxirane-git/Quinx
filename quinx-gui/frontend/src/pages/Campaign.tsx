@@ -70,8 +70,8 @@ const Campaign = () => {
             setSelected(filename);
             setIsNew(false);
             await fetchCampaigns();
-        } catch (e: any) {
-            setMsg({ type: 'error', text: e.response?.data?.detail || e.message });
+        } catch (e: unknown) {
+            setMsg({ type: 'error', text: e instanceof Error ? e.message : 'Save failed.' });
         } finally {
             setSaving(false);
         }

@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8000';
+const BASE = 'http://localhost:8001';
 
 function authHeader(): Record<string, string> {
  const token = localStorage.getItem('token');
@@ -52,6 +52,13 @@ export const api = {
    method: 'POST',
    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
    body: new URLSearchParams(data).toString(),
+  }).then(handleResponse);
+ },
+
+ delete(path: string) {
+  return fetch(`${BASE}${path}`, {
+   method: 'DELETE',
+   headers: { ...authHeader() },
   }).then(handleResponse);
  },
 };
