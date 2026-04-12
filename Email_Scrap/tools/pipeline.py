@@ -191,6 +191,23 @@ def main():
             print(f"[WARN] Maps search failed for {city} (exit {rc}), skipping.", flush=True)
         time.sleep(1.5)
 
+    # Truncate raw JSON files to limit so Step 2 only scrapes what we need
+    if args.limit and args.limit > 0:
+        import json
+        for city in cities:
+            city_slug = slugify(city)
+            raw_path = f".tmp/raw_places_{niche_slug}_{city_slug}.json"
+            if os.path.exists(raw_path):
+                try:
+                    with open(raw_path, encoding="utf-8") as f:
+                        places = json.load(f)
+                    if isinstance(places, list) and len(places) > args.limit:
+                        with open(raw_path, "w", encoding="utf-8") as f:
+                            json.dump(places[:args.limit], f, ensure_ascii=False)
+                        print(f"[INFO] Truncated {city_slug} to {args.limit} entries for scraping.", flush=True)
+                except Exception:
+                    pass
+
     # Step 2: Scrape emails
     raw_files = sorted(glob.glob(f".tmp/raw_places_{niche_slug}_*.json"))
     print(f"\n-- Step 2 / 4 - Website Scraping ({len(raw_files)} files) --", flush=True)

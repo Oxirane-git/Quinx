@@ -21,9 +21,17 @@ export default {
         'quinx-border': '#21262d',
         'quinx-green': '#00ff88',
         'quinx-muted': '#8b949e',
+        // Landing Page theme
+        'obsidian': '#0A0A0B',
+        'gunmetal': '#161618',
+        'matrix': '#00FF41',
+        'matrix-hover': '#00e63a',
+        'divider': '#262629',
+        'pure-white': '#FFFFFF',
       },
       fontFamily: {
         sans: ['"Inter"', 'sans-serif'],
+        mono: ['"Geist Mono"', 'monospace'],
       }
     },
   },

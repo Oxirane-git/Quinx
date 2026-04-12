@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Database, Download } from 'lucide-react';
 import { api } from '../lib/api';
 
 interface Campaign {
@@ -47,88 +47,92 @@ export default function Logs() {
  };
 
  return (
-  <div className="h-full flex flex-col animate-in fade-in duration-500">
-   <header className="border-b border-border pb-4 mb-6 flex justify-between items-end">
+  <div className="h-full flex flex-col animate-in fade-in duration-500 font-sans text-white pb-6">
+   <header className="border-b border-divider pb-4 mb-6 flex justify-between items-end">
     <div>
-     <h1 className="text-2xl font-bold text-primary">DATASTORE_LOGS</h1>
-     <p className="text-textMuted text-sm mt-1">Global audit of all historical routines.</p>
+     <div className="flex items-center space-x-3 mb-2">
+      <Database className="w-6 h-6 text-matrix" />
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">DATASTORE_LOGS</h1>
+     </div>
+     <p className="text-gray-400 text-sm pl-9">Global audit of all historical routines.</p>
     </div>
-    <div className="flex gap-2">
+    <div className="flex gap-4 font-mono font-bold tracking-wider">
      <button
       onClick={exportCsv}
       disabled={campaigns.length === 0}
-      className="bg-surface border border-border hover:border-primary text-textMain hover:text-primary px-4 py-2 text-sm flex gap-2 items-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      className="bg-gunmetal border border-divider hover:border-matrix hover:bg-matrix/5 text-white hover:text-matrix px-5 py-2.5 text-xs flex gap-2 items-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(0,0,0,0.5)]"
      >
-      EXPORT_CSV
+      <Download className="w-4 h-4" />
+      EXPORT_DUMP
      </button>
      <button
       onClick={deleteAll}
       disabled={campaigns.length === 0}
-      className="bg-surface border border-danger/40 hover:border-danger text-danger px-4 py-2 text-sm flex gap-2 items-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      className="bg-gunmetal border border-red-500/30 hover:border-red-500 hover:bg-red-900/20 text-red-500 px-5 py-2.5 text-xs flex gap-2 items-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(0,0,0,0.5)]"
      >
       <Trash2 className="w-4 h-4" />
-      CLEAR_ALL
+      PURGE_ALL()
      </button>
     </div>
    </header>
 
-   <div className="bg-surface border border-border flex-1 overflow-auto">
-    <table className="w-full text-left text-sm whitespace-nowrap text-textMain">
-     <thead className="uppercase text-xs text-textMuted border-b border-border bg-surface shadow-sm">
+   <div className="bg-gunmetal border border-divider flex-1 overflow-auto bento-hover shadow-2xl relative">
+    <table className="w-full text-left text-sm whitespace-nowrap text-white font-mono">
+     <thead className="uppercase text-[10px] text-gray-500 border-b border-divider bg-obsidian sticky top-0 z-10 shadow-sm">
       <tr>
-       <th className="p-4">CID</th>
-       <th className="p-4">Routine Name</th>
-       <th className="p-4">Niche</th>
-       <th className="p-4">Lifecycle</th>
-       <th className="p-4">Created</th>
-       <th className="p-4">Leads</th>
-       <th className="p-4">Emails</th>
-       <th className="p-4"></th>
+       <th className="p-4 font-bold tracking-wider">NODE_ID</th>
+       <th className="p-4 font-bold tracking-wider">ROUTINE_ALIAS</th>
+       <th className="p-4 font-bold tracking-wider">INDUSTRY_VECTOR</th>
+       <th className="p-4 font-bold tracking-wider">LIFECYCLE</th>
+       <th className="p-4 font-bold tracking-wider">DEPLOYED_AT</th>
+       <th className="p-4 font-bold tracking-wider">LEADS.XLSX</th>
+       <th className="p-4 font-bold tracking-wider">PAYLOADS.XLSX</th>
+       <th className="p-4 font-bold tracking-wider"></th>
       </tr>
      </thead>
-     <tbody>
+     <tbody className="divide-y divide-divider/50 text-xs border-t-2 border-matrix/50">
       {loading ? (
-       <tr><td colSpan={8} className="p-4 text-textMuted italic">Loading campaigns...</td></tr>
+       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">Contacting datastore...</td></tr>
       ) : campaigns.length === 0 ? (
-       <tr><td colSpan={8} className="p-4 text-textMuted italic">No campaigns yet. Run the scraper to create one.</td></tr>
+       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">No persistent states recorded.</td></tr>
       ) : campaigns.map(c => (
-       <tr key={c.id} className="border-b border-border hover:bg-slate-50 transition-colors group">
-        <td className="p-4 text-textMuted font-bold">#{c.id}</td>
-        <td className="p-4 text-primary">{c.name}</td>
-        <td className="p-4 text-textMain text-sm">{c.niche}</td>
+       <tr key={c.id} className="hover:bg-obsidian transition-colors group">
+        <td className="p-4 text-gray-500 font-bold tracking-wider">#{String(c.id).padStart(4, '0')}</td>
+        <td className="p-4 text-white font-bold">{c.name}</td>
+        <td className="p-4 text-gray-400">{c.niche}</td>
         <td className="p-4">
-         <span className={`px-2 py-1 text-xs border ${c.status === 'completed' ? 'border-primary text-primary bg-primary/10' : 'border-blue-500 text-blue-500 bg-blue-500/10'}`}>
+         <span className={`px-2 py-1 text-[10px] uppercase font-bold tracking-wider border ${c.status === 'completed' ? 'border-matrix/30 text-matrix bg-matrix/5' : 'border-blue-500/30 text-blue-400 bg-blue-500/10'}`}>
           {c.status?.toUpperCase() || 'ACTIVE'}
          </span>
         </td>
-        <td className="p-4 text-textMuted">{c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}</td>
+        <td className="p-4 text-gray-500">{c.created_at ? new Date(c.created_at).toISOString().split('T')[0] : '—'}</td>
         <td className="p-4">
          {c.has_leads ? (
           <button
            onClick={() => api.download(`/api/campaigns/${c.id}/download/leads`, `${c.name}_leads.xlsx`)}
-           className="text-primary text-xs border border-primary bg-primary/5 px-2 py-1 hover:bg-primary/10 transition-colors"
+           className="text-gray-400 text-[10px] uppercase font-bold tracking-wider border border-divider bg-obsidian px-2 py-1 hover:border-matrix hover:text-matrix transition-colors flex items-center gap-1 w-max"
           >
-           .xlsx ↓
+           <span>RAW</span> <Download className="w-3 h-3" />
           </button>
-         ) : <span className="text-zinc-400 text-xs">—</span>}
+         ) : <span className="text-gray-700 text-xs">—</span>}
         </td>
         <td className="p-4">
          {c.has_emails ? (
           <button
            onClick={() => api.download(`/api/campaigns/${c.id}/download/emails`, `${c.name}_emails.xlsx`)}
-           className="text-primary text-xs border border-primary bg-primary/5 px-2 py-1 hover:bg-primary/10 transition-colors"
+           className="text-gray-400 text-[10px] uppercase font-bold tracking-wider border border-divider bg-obsidian px-2 py-1 hover:border-matrix hover:text-matrix transition-colors flex items-center gap-1 w-max"
           >
-           .xlsx ↓
+           <span>PXD</span> <Download className="w-3 h-3" />
           </button>
-         ) : <span className="text-zinc-400 text-xs">—</span>}
+         ) : <span className="text-gray-700 text-xs">—</span>}
         </td>
-        <td className="p-4">
+        <td className="p-4 text-right">
          <button
           onClick={() => deleteCampaign(c.id, c.name)}
-          className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-danger transition-all"
+          className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-500 transition-all p-2 bg-black border border-zinc-800 hover:border-red-500/50 rounded-sm"
           title="Delete campaign"
          >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-3.5 h-3.5" />
          </button>
         </td>
        </tr>

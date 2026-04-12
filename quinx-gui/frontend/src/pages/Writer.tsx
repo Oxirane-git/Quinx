@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
+import { Pencil, Send, Download, FileText } from 'lucide-react';
 
 interface Campaign { id: number; name: string; niche: string; }
 interface Lead { id: number; business_name: string; email: string; city: string; status: string; }
@@ -108,80 +109,92 @@ export default function Writer() {
  };
 
  return (
-  <div className="flex gap-6 h-full animate-in fade-in duration-500">
-   <div className="w-1/3 flex flex-col gap-6 overflow-y-auto">
-    <header className="border-b border-border pb-4">
-     <h1 className="text-2xl font-bold text-primary ">LLM_WRITER</h1>
-     <p className="text-textMuted text-sm mt-1">Batch process generated copy.</p>
+  <div className="flex gap-8 h-full animate-in fade-in duration-500 font-sans text-white">
+   <div className="w-[400px] flex flex-col gap-6 flex-shrink-0">
+    <header className="border-b border-divider pb-4">
+     <div className="flex items-center space-x-3 mb-2">
+      <Pencil className="w-6 h-6 text-matrix" />
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">LLM_WRITER</h1>
+     </div>
+     <p className="text-gray-400 text-sm pl-9">Batch process semantic payload generation.</p>
     </header>
 
-    <div className="bg-surface shadow-sm border border-border p-5 space-y-4">
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Target Campaign</label>
-      <select
-       value={selectedCampaign}
-       onChange={e => handleCampaignChange(e.target.value ? Number(e.target.value) : '')}
-       className="w-full bg-surface border border-border p-2 text-sm text-textMain outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-      >
-       <option value="">-- Select Campaign --</option>
-       {campaigns.map(c => (
-        <option key={c.id} value={c.id}>{c.name} ({c.niche})</option>
-       ))}
-      </select>
-     </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Campaign Config (optional)</label>
-      <input
-       type="text"
-       value={campaignConfig}
-       onChange={e => setCampaignConfig(e.target.value)}
-       placeholder="e.g. quinx_ai (slug from Campaign page)"
-       className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain"
-      />
-     </div>
-     <div className="flex gap-4">
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">Index Start</label>
-       <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
+    <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+     <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
+     <div className="space-y-4 font-mono">
+      <div>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET_CAMPAIGN</label>
+       <select
+        value={selectedCampaign}
+        onChange={e => handleCampaignChange(e.target.value ? Number(e.target.value) : '')}
+        className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+       >
+        <option value="">-- SELECT_NODE --</option>
+        {campaigns.map(c => (
+         <option key={c.id} value={c.id}>{c.name} ({c.niche})</option>
+        ))}
+       </select>
       </div>
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">Index End</label>
-       <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
+      <div>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">CONFIG_OVERRIDE (OPTIONAL)</label>
+       <input
+        type="text"
+        value={campaignConfig}
+        onChange={e => setCampaignConfig(e.target.value)}
+        placeholder="e.g. quinx_ai"
+        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none"
+       />
       </div>
-     </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted mb-1 flex justify-between">
-       <span>Temperature</span>
-       <span className="text-primary border border-primary/20 px-1">{temperature}</span>
-      </label>
-      <input type="range" min="0.3" max="1" step="0.1" value={temperature} onChange={e => setTemperature(Number(e.target.value))} className="w-full accent-primary" />
-     </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Max Tokens</label>
       <div className="flex gap-4">
-       <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="tk" checked={maxTokens === 1024} onChange={() => setMaxTokens(1024)} className="accent-primary" /> 1024</label>
-       <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="tk" checked={maxTokens === 2048} onChange={() => setMaxTokens(2048)} className="accent-primary" /> 2048</label>
+       <div className="flex-1">
+        <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">INDEX_START</label>
+        <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
+       <div className="flex-1">
+        <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">INDEX_END</label>
+        <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
       </div>
+      <div>
+       <label className="text-xs font-bold text-gray-500 mb-2 flex justify-between uppercase">
+        <span>Temperature</span>
+        <span className="text-matrix bg-black border border-zinc-800 px-2">{temperature.toFixed(1)}</span>
+       </label>
+       <input type="range" min="0.3" max="1" step="0.1" value={temperature} onChange={e => setTemperature(Number(e.target.value))} className="w-full accent-matrix" />
+      </div>
+      <div>
+       <label className="text-xs font-bold text-gray-500 block mb-3 tracking-wider">MAX_TOKENS</label>
+       <div className="flex gap-6">
+        <label className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-matrix transition-colors">
+         <input type="radio" name="tk" checked={maxTokens === 1024} onChange={() => setMaxTokens(1024)} className="accent-matrix" /> 1024
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-matrix transition-colors">
+         <input type="radio" name="tk" checked={maxTokens === 2048} onChange={() => setMaxTokens(2048)} className="accent-matrix" /> 2048
+        </label>
+       </div>
+      </div>
+      <div className="text-xs bg-obsidian p-4 border border-divider mt-6 flex justify-between items-center text-white shadow-inner">
+       <span className="tracking-wider uppercase text-gray-500">Predicted Compute Cost:</span>
+       <span className="text-xl font-bold text-matrix tracking-normal">${estimatedCost}</span>
+      </div>
+      {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-none mt-2">ERR: {error}</p>}
      </div>
-     <div className="text-xs bg-surface p-3 border border-border mt-4 text-textMain text-sm">
-      <p>Estimated Cost:</p>
-      <p className="text-lg font-bold text-primary">${estimatedCost}</p>
-     </div>
-     {error && <p className="text-red-400 text-xs border border-red-900/50 bg-red-900/10 px-3 py-2">{error}</p>}
-     <div className="flex gap-2 mt-4">
+
+     <div className="flex gap-3 pt-4 border-t border-divider font-mono">
       <button
        disabled={running}
        onClick={startWriting}
-       className="flex-1 py-3 border border-primary/20 text-sm font-bold bg-primary/10 text-primary hover:bg-primaryHover hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow"
+       className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
       >
-       {running ? 'PROCESSING...' : 'EXECUTE_GENERATION'}
+       <Send className="w-4 h-4" />
+       {running ? 'PROCESSING...' : 'EXECUTE_GENERATION()'}
       </button>
       {running && (
        <button
         onClick={stopWriting}
-        className="py-3 px-4 border border-red-500/50 text-sm font-bold bg-red-900/20 text-red-500 hover:bg-red-900/40 transition-colors"
+        className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
        >
-        STOP
+        SIGKILL
        </button>
       )}
      </div>
@@ -190,55 +203,67 @@ export default function Writer() {
       <button
        type="button"
        onClick={() => api.download(`/api/campaigns/${downloadId}/download/emails`, `campaign_${downloadId}_emails.xlsx`)}
-       className="w-full py-2 border border-primary text-primary bg-primary/10 text-sm hover:bg-primary/20 transition-colors"
+       className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2"
       >
-       ↓ DOWNLOAD_EMAILS.xlsx
+       <Download className="w-4 h-4" />
+       PULL_OUTPUT.XLSX
       </button>
      )}
     </div>
    </div>
 
-   <div className="flex-1 flex flex-col gap-4">
-    <div className="bg-surface border border-border flex-1 overflow-auto">
-     <div className="p-3 border-b border-border bg-surface shadow-sm flex items-center justify-between text-xs">
-      <span className="text-textMuted">OUTPUT_PREVIEW</span>
-      <span className={`w-3 h-3 rounded-full ${running ? 'bg-primary animate-pulse' : 'bg-slate-200'}`}></span>
+   <div className="flex-1 flex flex-col gap-6 h-[calc(100vh-6rem)]">
+    <div className="bg-gunmetal border border-divider flex-1 overflow-auto bento-hover shadow-lg">
+     <div className="p-4 border-b border-divider bg-obsidian flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500 relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-matrix/10 to-transparent"></div>
+      <div className="flex items-center gap-2">
+       <FileText className="w-4 h-4 text-matrix/50" />
+       <span>PAYLOAD_INSPECTOR</span>
+      </div>
+      <span className={`w-2 h-2 rounded-full ${running ? 'bg-matrix animate-pulse' : 'bg-gray-600'}`}></span>
      </div>
-     <table className="w-full text-left text-sm whitespace-nowrap text-textMain">
-      <thead className="uppercase text-xs text-textMuted border-b border-border">
+     <table className="w-full text-left text-sm whitespace-nowrap text-white font-mono">
+      <thead className="uppercase text-[10px] text-gray-500 border-b border-divider sticky top-0 bg-gunmetal">
        <tr>
-        <th className="p-3">#</th>
-        <th className="p-3">Business</th>
-        <th className="p-3">Email</th>
-        <th className="p-3">City</th>
-        <th className="p-3">Status</th>
+        <th className="p-4 font-bold tracking-wider">#</th>
+        <th className="p-4 font-bold tracking-wider">Target_Entity</th>
+        <th className="p-4 font-bold tracking-wider">Address</th>
+        <th className="p-4 font-bold tracking-wider">Vector</th>
+        <th className="p-4 font-bold tracking-wider">State</th>
        </tr>
       </thead>
-      <tbody>
+      <tbody className="divide-y divide-divider/50 text-xs">
        {leads.length === 0 ? (
-        <tr><td colSpan={5} className="p-4 text-textMuted italic">No leads loaded. Select a campaign.</td></tr>
+        <tr><td colSpan={5} className="p-6 text-gray-600 italic">No valid entities. Initialize node selection.</td></tr>
        ) : leads.map((lead, i) => (
-        <tr key={lead.id} className="border-b border-border hover:bg-slate-50">
-         <td className="p-3">{i + 1}</td>
-         <td className="p-3">{lead.business_name}</td>
-         <td className="p-3">{lead.email}</td>
-         <td className="p-3">{lead.city}</td>
-         <td className={`p-3 ${lead.status === 'written' ? 'text-primary font-bold' : 'text-textMuted'}`}>{lead.status?.toUpperCase() || 'PENDING'}</td>
+        <tr key={lead.id} className="hover:bg-obsidian transition-colors">
+         <td className="p-4 text-gray-500">{i + 1}</td>
+         <td className="p-4 ">{lead.business_name}</td>
+         <td className="p-4 text-gray-400">{lead.email}</td>
+         <td className="p-4 text-gray-500">{lead.city}</td>
+         <td className="p-4">
+          <span className={`px-2 py-1 ${lead.status === 'written' ? 'text-matrix bg-matrix/10 border border-matrix/20' : 'text-gray-500 bg-black border border-zinc-800'}`}>
+           {lead.status?.toUpperCase() || 'PENDING_EVAL'}
+          </span>
+         </td>
         </tr>
        ))}
       </tbody>
      </table>
     </div>
 
-    <div className="bg-surface border border-border flex-1 p-4 overflow-y-auto font-mono text-xs text-textMain max-h-48 space-y-0.5">
-     {!log ? (
-      <span className="text-textMuted italic">No output yet.</span>
-     ) : log.split('\n').map((l, i) => (
-      <div key={i} className={l.includes('ERROR') ? 'text-red-400' : l.includes('complete') || l.includes('Success') ? 'text-primary' : ''}>
-       {l}
-      </div>
-     ))}
-     <div ref={logEndRef} />
+    <div className="bg-black border border-zinc-800 h-48 flex flex-col shadow-lg relative bento-hover">
+     <div className="p-2 border-b border-divider bg-gunmetal font-mono text-[10px] uppercase text-gray-500 tracking-widest pl-4">STDOUT // Execution Log</div>
+     <div className="flex-1 p-4 overflow-y-auto font-mono text-xs text-white space-y-1.5 scrollbar-thin scrollbar-thumb-divider scrollbar-track-transparent">
+      {!log ? (
+       <span className="text-gray-600 italic">No output yet.</span>
+      ) : log.split('\n').map((l, i) => (
+       <div key={i} className={l.includes('ERROR') ? 'text-red-500' : l.includes('complete') || l.includes('Success') ? 'text-matrix/90' : 'text-gray-400 font-sans tracking-wide leading-relaxed'}>
+        {l}
+       </div>
+      ))}
+      <div ref={logEndRef} className="h-4" />
+     </div>
     </div>
    </div>
   </div>

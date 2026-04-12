@@ -1,166 +1,102 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../lib/api';
+import { useScraperStore } from '../lib/scraperStore';
+import { Target, Download, Server, ExternalLink } from 'lucide-react';
 
 export default function Scraper() {
- const [logs, setLogs] = useState<string[]>([]);
- const [isRunning, setIsRunning] = useState(false);
+ const { logs, isRunning, downloadId, downloadName, startScrape, stopScrape } = useScraperStore();
+
  const [niche, setNiche] = useState('');
  const [cities, setCities] = useState('');
  const [leadLimit, setLeadLimit] = useState(60);
  const [campaignName, setCampaignName] = useState('');
- const [downloadId, setDownloadId] = useState<number | null>(null);
- const [downloadName, setDownloadName] = useState('');
- const [currentJobId, setCurrentJobId] = useState<string | null>(null);
  const logEndRef = useRef<HTMLDivElement>(null);
- const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
- const appendLog = (line: string) => setLogs(prev => [...prev, line]);
-
- const startScrape = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setIsRunning(true);
-  setDownloadId(null);
-  setLogs(['[SYSTEM] Dispatching scraper task...']);
-
-  const cityList = cities.split(',').map(c => c.trim()).filter(Boolean);
-  const name = campaignName || `${niche}_${Date.now()}`;
-
-  try {
-   const { job_id, campaign_id } = await api.post('/api/scraper/start-task', {
-    niche,
-    cities: cityList,
-    lead_limit: leadLimit,
-    campaign_name: name,
-   });
-
-   setCurrentJobId(job_id);
-   appendLog(`[INFO] Task queued — Job ID: ${job_id}`);
-
-   pollRef.current = setInterval(async () => {
-    try {
-     const status = await api.get(`/api/campaigns/task/${job_id}/status`);
-
-     if (status.log) {
-      const lines = status.log.split('\n').filter(Boolean);
-      setLogs(prev => {
-       const base = prev.filter(l => !l.startsWith('[PIPELINE]'));
-       return [...base, ...lines.map((l: string) => `[PIPELINE] ${l}`)];
-      });
-     }
-
-     if (status.status === 'SUCCESS') {
-      appendLog(`[SYSTEM] Task complete. ${JSON.stringify(status.result)}`);
-      clearInterval(pollRef.current!);
-      setIsRunning(false);
-      setCurrentJobId(null);
-      setDownloadId(campaign_id);
-      setDownloadName(name);
-     } else if (status.status === 'FAILURE') {
-      appendLog(`[ERROR] Task failed.`);
-      clearInterval(pollRef.current!);
-      setIsRunning(false);
-      setCurrentJobId(null);
-     } else if (status.status === 'CANCELLED') {
-      appendLog(`[SYSTEM] Task cancelled.`);
-      clearInterval(pollRef.current!);
-      setIsRunning(false);
-      setCurrentJobId(null);
-     }
-    } catch {
-     appendLog('[ERROR] Failed to poll task status.');
-     clearInterval(pollRef.current!);
-     setIsRunning(false);
-    }
-   }, 2000);
-  } catch (err: unknown) {
-   appendLog(`[ERROR] ${err instanceof Error ? err.message : 'Failed to start task'}`);
-   setIsRunning(false);
-  }
- };
-
- const stopScrape = async () => {
-  if (!currentJobId) return;
-  try {
-   await api.post(`/api/scraper/stop-task/${currentJobId}`, {});
-   appendLog('[SYSTEM] Stop signal sent...');
-  } catch {
-   appendLog('[ERROR] Failed to send stop signal.');
-  }
- };
 
  useEffect(() => {
   logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
  }, [logs]);
 
- useEffect(() => {
-  return () => { if (pollRef.current) clearInterval(pollRef.current); };
- }, []);
+ const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const cityList = cities.split(',').map(c => c.trim()).filter(Boolean);
+  const name = campaignName || `${niche}_${Date.now()}`;
+  await startScrape({ niche, cities: cityList, lead_limit: leadLimit, campaign_name: name });
+ };
 
  return (
-  <div className="flex gap-6 h-full animate-in fade-in duration-500">
-   <div className="w-1/3 flex flex-col gap-6">
-    <header className="border-b border-border pb-4">
-     <h1 className="text-2xl font-bold text-primary ">LEAD_EXTRACTION</h1>
-     <p className="text-textMuted text-sm mt-1">Configure and deploy scraping spiders.</p>
+  <div className="flex gap-8 h-full animate-in fade-in duration-500 font-sans text-white">
+   <div className="w-[400px] flex flex-col gap-6 flex-shrink-0">
+    <header className="border-b border-divider pb-4">
+     <div className="flex items-center space-x-3 mb-2">
+      <Target className="w-6 h-6 text-matrix" />
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">LEAD_EXTRACTION</h1>
+     </div>
+     <p className="text-gray-400 text-sm pl-9">Configure and deploy scraping spiders.</p>
     </header>
 
-    <form onSubmit={startScrape} className="bg-surface shadow-sm border border-border p-5 space-y-4">
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Campaign Name</label>
-      <input
-       type="text"
-       value={campaignName}
-       onChange={e => setCampaignName(e.target.value)}
-       className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain"
-       placeholder="e.g. NYC_Restaurants_Q1"
-      />
+    <form onSubmit={handleSubmit} className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+     <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
+
+     <div className="space-y-4 font-mono">
+      <div>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">CAMPAIGN NAME (OPTIONAL)</label>
+       <input
+        type="text"
+        value={campaignName}
+        onChange={e => setCampaignName(e.target.value)}
+        className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        placeholder="e.g. NYC_Restaurants_Q1"
+       />
+      </div>
+      <div>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET_INDUSTRY</label>
+       <input
+        type="text"
+        value={niche}
+        onChange={e => setNiche(e.target.value)}
+        className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        placeholder="e.g. Restaurants"
+        required
+       />
+      </div>
+      <div>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET CITIES (CSV)</label>
+       <textarea
+        value={cities}
+        onChange={e => setCities(e.target.value)}
+        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white resize-none h-24"
+        placeholder="New York, London, Tokyo..."
+        required
+       />
+      </div>
+      <div>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">LEAD LIMIT PER CITY</label>
+       <input
+        type="number"
+        value={leadLimit}
+        onChange={e => setLeadLimit(Number(e.target.value))}
+        max="500"
+        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+       />
+      </div>
      </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Target Niche</label>
-      <input
-       type="text"
-       value={niche}
-       onChange={e => setNiche(e.target.value)}
-       className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain"
-       placeholder="e.g. Restaurants"
-       required
-      />
-     </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Geolocation Vectors (comma-separated)</label>
-      <textarea
-       value={cities}
-       onChange={e => setCities(e.target.value)}
-       className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain resize-none h-20"
-       placeholder="New York, London, Tokyo..."
-       required
-      />
-     </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Max Leads / Vector</label>
-      <input
-       type="number"
-       value={leadLimit}
-       onChange={e => setLeadLimit(Number(e.target.value))}
-       max="200"
-       className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain"
-      />
-     </div>
-     <div className="flex gap-2 mt-4">
+
+     <div className="flex gap-3 pt-4 border-t border-divider font-mono">
       <button
        disabled={isRunning}
        type="submit"
-       className="flex-1 py-3 border text-sm font-bold bg-surface transition-colors bg-primary/10 border-primary/20 text-primary hover:bg-primaryHover hover:text-white disabled:opacity-50 disabled:cursor-not-allowed shadow"
+       className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
       >
-       {isRunning ? 'RUNTIME_ACTIVE' : 'DEPLOY_SPIDERS'}
+       <ExternalLink className="w-4 h-4" />
+       {isRunning ? 'SPIDERS_ACTIVE...' : 'DEPLOY_SPIDERS()'}
       </button>
       {isRunning && (
        <button
         type="button"
         onClick={stopScrape}
-        className="px-4 py-3 border text-sm font-bold border-danger/40 text-danger bg-danger/10 hover:bg-danger hover:text-white transition-colors shadow"
+        className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
        >
-        STOP
+        SIGKILL
        </button>
       )}
      </div>
@@ -169,32 +105,54 @@ export default function Scraper() {
       <button
        type="button"
        onClick={() => api.download(`/api/campaigns/${downloadId}/download/leads`, `${downloadName}_leads.xlsx`)}
-       className="w-full py-2 border border-primary text-primary bg-primary/5/40 text-primary text-sm hover:bg-primaryHover hover:text-white hover:text-black transition-colors"
+       className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2"
       >
-       ↓ DOWNLOAD_LEADS.xlsx
+       <Download className="w-4 h-4" />
+       PULL_OUTPUT.XLSX
       </button>
      )}
     </form>
    </div>
 
-   <div className="flex-1 bg-surface border border-border flex flex-col shadow-2xl relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-full h-1 bg-primary h-1 opacity-20"></div>
-    <div className="p-3 border-b border-border bg-surface shadow-sm flex items-center justify-between text-xs">
-     <span className="text-textMuted">TERMINAL OUTPUT</span>
-     <span className={`w-3 h-3 rounded-full ${isRunning ? 'bg-primary animate-pulse' : 'bg-slate-200'}`}></span>
+   <div className="flex-1 bg-obsidian border border-divider flex flex-col shadow-2xl relative overflow-hidden bento-hover group">
+    <div className={`absolute top-0 left-0 w-full h-1 ${isRunning ? 'bg-matrix animate-pulse shadow-[0_0_15px_rgba(0,255,65,0.5)]' : 'bg-gray-800'}`}></div>
+
+    <div className="p-4 border-b border-divider bg-gunmetal/80 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500">
+     <div className="flex items-center gap-2">
+      <Server className="w-4 h-4" />
+      <span>STDOUT // Terminal</span>
+     </div>
+     <div className="flex items-center gap-2">
+      <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-matrix animate-pulse' : 'bg-gray-600'}`}></span>
+      <span>{isRunning ? 'ACTIVE' : 'IDLE'}</span>
+     </div>
     </div>
-    <div className="flex-1 p-4 overflow-y-auto text-sm text-textMain text-sm space-y-1">
+
+    <div className="flex-1 p-5 overflow-y-auto font-mono text-xs max-w-full space-y-1.5 scrollbar-thin scrollbar-thumb-divider scrollbar-track-transparent">
      {logs.length === 0 ? (
-      <span className="text-textMuted italic">Waiting for task dispatch...</span>
+      <span className="text-gray-600 italic">Waiting for process dispatch...</span>
      ) : (
-      logs.map((l, i) => (
-       <div key={i} className={l.includes('ERROR') ? 'text-red-400' : l.includes('SUCCESS') || l.includes('[INFO]') ? 'text-primary' : l.includes('SYSTEM') ? 'text-blue-400' : ''}>
-        <span className="text-textMuted mr-2">{new Date().toISOString().split('T')[1].substring(0, 8)}</span>
-        {l}
-       </div>
-      ))
+      logs.map((l, i) => {
+       const isError = l.includes('ERROR');
+       const isSuccess = l.includes('SUCCESS') || l.includes('[INFO]') || l.includes('Task complete');
+       const isSystem = l.includes('SYSTEM');
+
+       let textColor = 'text-gray-400';
+       if (isError) textColor = 'text-red-500';
+       else if (isSuccess) textColor = 'text-matrix/90';
+       else if (isSystem) textColor = 'text-blue-400';
+
+       return (
+        <div key={i} className={`flex gap-3 leading-relaxed break-words hover:bg-gunmetal/30 px-1 -mx-1 rounded-sm ${textColor}`}>
+         <span className="text-gray-600 flex-shrink-0 select-none">
+          [{new Date().toISOString().split('T')[1].substring(0, 8)}]
+         </span>
+         <span className="break-all">{l}</span>
+        </div>
+       );
+      })
      )}
-     <div ref={logEndRef} />
+     <div ref={logEndRef} className="h-4" />
     </div>
    </div>
   </div>

@@ -97,7 +97,7 @@ const Campaign = () => {
                 <textarea
                     rows={5}
                     placeholder={placeholder}
-                    className="bg-obsidian border border-divider rounded-none px-4 py-3 text-sm text-pure-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors resize-none font-mono"
+                    className="bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors resize-none font-mono"
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 />
@@ -105,7 +105,7 @@ const Campaign = () => {
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="bg-obsidian border border-divider rounded-none px-4 py-3 text-sm text-pure-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors font-mono"
+                    className="bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors font-mono"
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 />
@@ -119,7 +119,7 @@ const Campaign = () => {
             <header className="pb-4 border-b border-divider">
                 <div className="flex items-center space-x-3 mb-2">
                     <Zap className="text-matrix w-6 h-6" />
-                    <h1 className="text-2xl font-bold font-mono tracking-tight uppercase text-pure-white">CAMPAIGN_CONFIG</h1>
+                    <h1 className="text-2xl font-bold font-mono tracking-tight uppercase text-white">CAMPAIGN_CONFIG</h1>
                 </div>
                 <p className="text-gray-400 text-sm font-sans pl-9">
                     Define the service framework. Each campaign object is injected into the Gemini evaluation prompt.
@@ -152,13 +152,13 @@ const Campaign = () => {
                                 className={`group flex items-center justify-between px-5 py-3 cursor-pointer transition-colors ${
                                     selected === c.filename
                                         ? 'bg-matrix/10 border-l-2 border-matrix shadow-[inset_4px_0_0_0_rgba(0,255,65,0.2)]'
-                                        : 'text-gray-400 hover:bg-obsidian hover:text-pure-white border-l-2 border-transparent'
+                                        : 'text-gray-400 hover:bg-obsidian hover:text-white border-l-2 border-transparent'
                                 }`}
                             >
                                 <div className="flex items-center space-x-3 min-w-0">
                                     <Terminal className={`w-4 h-4 flex-shrink-0 ${selected === c.filename ? 'text-matrix' : 'text-gray-600'}`} />
                                     <div className="min-w-0 font-mono">
-                                        <p className={`text-sm tracking-tight truncate ${selected === c.filename ? 'text-matrix font-bold' : 'text-pure-white'}`}>
+                                        <p className={`text-sm tracking-tight truncate ${selected === c.filename ? 'text-matrix font-bold' : 'text-white'}`}>
                                             {c.campaignName || c.filename}
                                         </p>
                                         <p className="text-[10px] text-gray-500 truncate mt-0.5">{c.filename}.json</p>
@@ -178,7 +178,7 @@ const Campaign = () => {
                 {/* Right: form */}
                 <div className="col-span-8 bg-gunmetal border border-divider rounded-none flex flex-col overflow-hidden bento-hover">
                     <div className="px-6 py-5 border-b border-divider flex items-center justify-between flex-shrink-0 bg-obsidian">
-                        <h2 className="text-sm font-bold font-mono text-pure-white uppercase flex items-center gap-2">
+                        <h2 className="text-sm font-bold font-mono text-white uppercase flex items-center gap-2">
                             <span className="w-2 h-2 bg-matrix"></span>
                             {isNew ? 'NEW_CAMPAIGN_NODE' : selected ? `MOUNTED: ${selected}` : 'AWAITING_SELECTION'}
                         </h2>
@@ -219,7 +219,7 @@ const Campaign = () => {
 
                                 {field('Pricing Schema', 'pricing', 'input', 'e.g. ₹3,999/month or $99/month')}
 
-                                <div className="bg-obsidian border border-divider rounded-none p-5 text-xs text-gray-400 space-y-2 font-mono mt-8">
+                                <div className="bg-black border border-zinc-800 rounded-none p-5 text-xs text-gray-400 space-y-2 font-mono mt-8">
                                     <p className="text-matrix font-bold mb-3 uppercase flex items-center gap-2">
                                         <ChevronRight className="w-4 h-4" /> Injection Map:
                                     </p>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
+import { Send, Server, Activity } from 'lucide-react';
 
 interface Campaign { id: number; name: string; niche: string; }
 interface EmailAccount { id: number; provider: string; email: string; host: string; port: string; }
@@ -91,87 +92,130 @@ export default function Sender() {
  };
 
  return (
-  <div className="flex gap-6 h-full animate-in fade-in duration-500">
-   <div className="w-1/3 flex flex-col gap-6">
-    <header className="border-b border-border pb-4">
-     <h1 className="text-2xl font-bold text-primary ">SMTP_DISPATCH</h1>
-     <p className="text-textMuted text-sm mt-1">Configure and fire delivery queues.</p>
+  <div className="flex gap-8 h-full animate-in fade-in duration-500 font-sans text-white">
+   <div className="w-[400px] flex flex-col gap-6 flex-shrink-0">
+    <header className="border-b border-divider pb-4">
+     <div className="flex items-center space-x-3 mb-2">
+      <Send className="w-6 h-6 text-matrix" />
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">SMTP_DISPATCH</h1>
+     </div>
+     <p className="text-gray-400 text-sm pl-9">Configure and fire delivery queues.</p>
     </header>
 
-    <div className="bg-surface shadow-sm border border-border p-5 space-y-4">
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Generated Payload</label>
-      <select
-       value={campaignId}
-       onChange={e => setCampaignId(e.target.value ? Number(e.target.value) : '')}
-       className="w-full bg-surface border border-border p-2 text-sm text-textMain outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-      >
-       <option value="">-- Select Campaign --</option>
-       {campaigns.map(c => (
-        <option key={c.id} value={c.id}>{c.name}</option>
-       ))}
-      </select>
+    <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+     <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
+
+     <div className="space-y-5 font-mono">
+      <div>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET_PAYLOAD</label>
+       <select
+        value={campaignId}
+        onChange={e => setCampaignId(e.target.value ? Number(e.target.value) : '')}
+        className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+       >
+        <option value="">-- SELECT_PAYLOAD_NODE --</option>
+        {campaigns.map(c => (
+         <option key={c.id} value={c.id}>{c.name}</option>
+        ))}
+       </select>
+      </div>
+      <div>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* SMTP_RELAY_NODE</label>
+       <select
+        value={accountId}
+        onChange={e => setAccountId(e.target.value ? Number(e.target.value) : '')}
+        className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+       >
+        <option value="">-- SELECT_SMTP_INSTANCE --</option>
+        {accounts.map(a => (
+         <option key={a.id} value={a.id}>{accountLabel(a)}</option>
+        ))}
+       </select>
+       {accounts.length === 0 && (
+        <p className="text-yellow-500/70 text-xs mt-2 italic flex gap-2"><Activity className="w-4 h-4"/> No outbound relays detected. Config in Settings.</p>
+       )}
+      </div>
+      <div className="flex gap-4">
+       <div className="flex-1">
+        <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">INDEX_START</label>
+        <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
+       <div className="flex-1">
+        <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">INDEX_END</label>
+        <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
+      </div>
+      <div className="flex gap-4 bg-black border border-zinc-800 p-4 shadow-inner">
+       <div className="flex-1">
+        <label className="text-[10px] font-bold text-matrix block mb-2 tracking-wider uppercase">Min STAGGER (s)</label>
+        <input type="number" value={minDelay} onChange={e => setMinDelay(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
+       <div className="flex-1">
+        <label className="text-[10px] font-bold text-matrix block mb-2 tracking-wider uppercase">Max STAGGER (s)</label>
+        <input type="number" value={maxDelay} onChange={e => setMaxDelay(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+       </div>
+      </div>
+      {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-none mt-2">ERR: {error}</p>}
      </div>
-     <div>
-      <label className="text-xs uppercase text-textMuted block mb-1">Sending Relay (SMTP/OAuth)</label>
-      <select
-       value={accountId}
-       onChange={e => setAccountId(e.target.value ? Number(e.target.value) : '')}
-       className="w-full bg-surface border border-border p-2 text-sm text-textMain outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+
+     <div className="flex gap-3 pt-4 border-t border-divider font-mono">
+      <button
+       disabled={running}
+       onClick={handleDispatch}
+       className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
       >
-       <option value="">-- Select Account --</option>
-       {accounts.map(a => (
-        <option key={a.id} value={a.id}>{accountLabel(a)}</option>
-       ))}
-      </select>
-      {accounts.length === 0 && (
-       <p className="text-textMuted text-xs mt-1">No email accounts. Add one in Settings.</p>
+       <Send className="w-4 h-4" />
+       {running ? 'DISPATCH_IN_PROGRESS...' : 'INITIATE_DISPATCH()'}
+      </button>
+      {running && (
+       <button
+        onClick={handleAbort}
+        className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
+       >
+        SIGKILL
+       </button>
       )}
      </div>
-     <div className="flex gap-4">
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">From #</label>
-       <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
-      </div>
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">To #</label>
-       <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
-      </div>
-     </div>
-     <div className="flex gap-4">
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">Min Delay (s)</label>
-       <input type="number" value={minDelay} onChange={e => setMinDelay(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
-      </div>
-      <div className="flex-1">
-       <label className="text-xs uppercase text-textMuted block mb-1">Max Delay (s)</label>
-       <input type="number" value={maxDelay} onChange={e => setMaxDelay(Number(e.target.value))} className="w-full bg-surface border border-border p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none text-textMain" />
-      </div>
-     </div>
-     {error && <p className="text-red-400 text-xs border border-red-900/50 bg-red-900/10 px-3 py-2">{error}</p>}
-     <button
-      onClick={running ? handleAbort : handleDispatch}
-      className={`w-full py-3 mt-4 border font-bold transition-colors text-sm shadow ${running ? 'bg-red-900/20 border-red-500/50 text-red-500 hover:bg-red-900/40' : 'bg-primary/10 border-primary/20 text-primary hover:bg-primaryHover hover:text-white hover:text-black'}`}
-     >
-      {running ? 'ABORT_TRANSMISSION' : 'INITIATE_DISPATCH'}
-     </button>
     </div>
    </div>
 
-   <div className="flex-1 bg-surface border border-border flex flex-col relative overflow-hidden">
-    <div className="p-3 border-b border-border bg-surface shadow-sm flex items-center justify-between text-xs">
-     <span className="text-textMuted">RELAY_LOG // {running ? 'ACTIVE' : 'IDLE'}</span>
-     <span className={`w-3 h-3 rounded-full ${running ? 'bg-primary animate-pulse' : 'bg-slate-200'}`}></span>
+   <div className="flex-1 bg-black border border-zinc-800 flex flex-col shadow-2xl relative overflow-hidden bento-hover">
+    <div className={`absolute top-0 left-0 w-full h-1 ${running ? 'bg-matrix animate-pulse shadow-[0_0_15px_rgba(0,255,65,0.5)]' : 'bg-gray-800'}`}></div>
+    
+    <div className="p-4 border-b border-divider bg-gunmetal/80 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500">
+     <div className="flex items-center gap-2">
+      <Server className="w-4 h-4" />
+      <span>STDOUT // RELAY_LOG</span>
+     </div>
+     <div className="flex items-center gap-2">
+      <span className={`w-2 h-2 rounded-full ${running ? 'bg-matrix animate-pulse' : 'bg-gray-600'}`}></span>
+      <span>{running ? 'OUTBOUND_ACTIVE' : 'IDLE'}</span>
+     </div>
     </div>
-    <div className="flex-1 p-4 overflow-y-auto font-mono text-xs text-textMain space-y-0.5">
+
+    <div className="flex-1 p-5 overflow-y-auto font-mono text-xs max-w-full space-y-1.5 scrollbar-thin scrollbar-thumb-divider scrollbar-track-transparent">
      {!log ? (
-      <span className="text-textMuted italic">No active dispatch routines...</span>
-     ) : log.split('\n').map((l, i) => (
-      <div key={i} className={l.includes('ERROR') ? 'text-red-400' : l.includes('complete') || l.includes('Success') ? 'text-primary' : l.includes('SYSTEM') ? 'text-blue-400' : ''}>
-       {l}
-      </div>
-     ))}
-     <div ref={logEndRef} />
+      <span className="text-gray-600 italic">No active dispatch routines...</span>
+     ) : log.split('\n').map((l, i) => {
+      const isError = l.includes('ERROR');
+      const isSuccess = l.includes('complete') || l.includes('SUCCESS');
+      const isSystem = l.includes('SYSTEM');
+      
+      let textColor = 'text-gray-400';
+      if (isError) textColor = 'text-red-500';
+      else if (isSuccess) textColor = 'text-matrix/90';
+      else if (isSystem) textColor = 'text-blue-400';
+
+      return (
+       <div key={i} className={`flex gap-3 leading-relaxed break-words hover:bg-gunmetal/30 px-1 -mx-1 rounded-sm ${textColor}`}>
+        <span className="text-gray-600 flex-shrink-0 select-none">
+         [{new Date().toISOString().split('T')[1].substring(0, 8)}]
+        </span>
+        <span className="break-all">{l}</span>
+       </div>
+      )
+     })}
+     <div ref={logEndRef} className="h-4" />
     </div>
    </div>
   </div>

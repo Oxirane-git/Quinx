@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
+import { Terminal } from 'lucide-react';
 
 export default function Auth() {
  const [isLogin, setIsLogin] = useState(true);
@@ -35,22 +36,28 @@ export default function Auth() {
  };
 
  return (
-  <div className="min-h-screen bg-background flex items-center justify-center text-textMain p-4">
-   <div className="max-w-md w-full border border-border bg-surface shadow-md overflow-hidden relative rounded-lg">
-    <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-    <div className="p-6 border-b border-border flex justify-between items-center">
-     <h2 className="text-xl font-bold text-textMain tracking-tight">QUINX // {isLogin ? 'LOGIN' : 'REGISTER'}</h2>
+  <div className="min-h-screen bg-obsidian flex items-center justify-center text-white p-4 relative selection:bg-matrix selection:text-obsidian">
+   <div className="absolute inset-0 bg-noise pointer-events-none z-0"></div>
+   <div className="absolute inset-0 scanlines pointer-events-none z-0 opacity-20"></div>
+
+   <div className="max-w-md w-full border border-divider bg-gunmetal shadow-2xl overflow-hidden relative rounded-none z-10 group">
+    <div className="absolute top-0 left-0 w-full h-1 bg-matrix"></div>
+    <div className="p-6 border-b border-divider flex justify-between items-center bg-obsidian">
+     <h2 className="text-xl font-bold font-mono text-white tracking-tight flex items-center gap-2">
+      <Terminal className="w-5 h-5 text-matrix" />
+      QUINX_AI // {isLogin ? 'LOGIN' : 'INIT_OPERATOR'}
+     </h2>
     </div>
 
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="p-8 space-y-5 font-mono">
      {!isLogin && (
       <div>
-       <label className="block text-xs font-medium text-textMuted mb-1 uppercase tracking-wider">Full Name</label>
+       <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Operator_Alias</label>
        <input
         type="text"
         value={name}
         onChange={e => setName(e.target.value)}
-        className="w-full bg-surface border border-border rounded px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-textMain transition-shadow"
+        className="w-full bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix text-white transition-shadow"
         placeholder="Jane Doe"
         required
        />
@@ -58,45 +65,45 @@ export default function Auth() {
      )}
 
      <div>
-      <label className="block text-xs font-medium text-textMuted mb-1 uppercase tracking-wider">Email Address</label>
+      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Access_Identifier (Email)</label>
       <input
        type="email"
        value={email}
        onChange={e => setEmail(e.target.value)}
-       className="w-full bg-surface border border-border rounded px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-textMain transition-shadow"
+       className="w-full bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix text-white transition-shadow"
        placeholder="hello@company.com"
        required
       />
      </div>
 
      <div>
-      <label className="block text-xs font-medium text-textMuted mb-1 uppercase tracking-wider">Password</label>
+      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Security_Key</label>
       <input
        type="password"
        value={password}
        onChange={e => setPassword(e.target.value)}
-       className="w-full bg-surface border border-border rounded px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-textMain transition-shadow"
+       className="w-full bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix text-white transition-shadow"
        placeholder="••••••••"
        required
       />
      </div>
 
      {error && (
-      <p className="text-danger-700 text-xs bg-red-50 border border-red-100 rounded px-3 py-2">{error}</p>
+      <p className="text-red-500 text-xs bg-red-900/10 border border-red-900/50 rounded-none px-4 py-3">ERR: {error}</p>
      )}
 
      <button
       type="submit"
       disabled={loading}
-      className="w-full bg-primary hover:bg-primaryHover text-white font-medium py-2 rounded transition-colors mt-6 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full bg-matrix hover:bg-matrix-hover text-obsidian font-bold font-mono py-3 rounded-none transition-colors mt-8 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed group-hover:shadow-[0_0_15px_rgba(0,255,65,0.2)]"
      >
-      {loading ? 'Please wait...' : isLogin ? 'Login to Dashboard' : 'Create Account'}
+      {loading ? 'AUTHENTICATING...' : isLogin ? 'EXECUTE_LOGIN()' : 'DEPLOY_ACCOUNT()'}
      </button>
 
-     <div className="text-center pt-4 text-sm text-textMuted">
-      {isLogin ? "Don't have an account? " : "Already have an account? "}
-      <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-primary font-medium hover:underline">
-       {isLogin ? "Sign up" : "Login"}
+     <div className="text-center pt-6 text-xs text-gray-500">
+      {isLogin ? "No clearance? " : "Clearance verified? "}
+      <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-matrix font-medium hover:underline focus:outline-none">
+       {isLogin ? "Request Access" : "Authenticate"}
       </button>
      </div>
     </form>
