@@ -1,14 +1,12 @@
 <p align="center">
-  <img src="quinx-gui/frontend/src/assets/hero.png" alt="Quinx AI GUI Dashboard" width="700"/>
-</p>
-<p align="center">
-  <img src="https://via.placeholder.com/800x400/0A0A0B/00FF41?text=EXTERNAL_LANDING_TERMINAL" alt="Quinx AI Interface Mode" width="700"/>
+  <img src="quinx-gui/frontend/src/assets/logo/q__2_-removebg-preview.png" alt="Quinx" width="120"/>
 </p>
 
-<h1 align="center">Quinx AI</h1>
+<h1 align="center">Quinx</h1>
 
 <p align="center">
-  <strong>End-to-end cold email outreach automation — from lead scraping to inbox delivery.</strong>
+  <strong>Find leads. Write emails. Close deals.</strong><br/>
+  End-to-end cold outreach automation — from scraping to inbox delivery, all from one dashboard.
 </p>
 
 <p align="center">
@@ -19,151 +17,138 @@
   <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License"/>
 </p>
 
----
-
-## 🎯 What is Quinx?
-
-**Quinx AI** is a five-stage automation pipeline controlled entirely through a local GUI dashboard:
-
-1. **⚡ Campaign** — Define the service you're pitching (name, tagline, context, pricing, sender) — saved as reusable JSON configs
-2. **🔍 Scrape** — Find businesses on Google Maps, extract emails from their websites
-3. **✍️ Write** — Generate hyper-personalized cold emails using AI (OpenRouter key rotation + Anthropic backup)
-4. **🚀 Send** — Deliver emails via SMTP with human-like delays
-5. **📊 Logs** — Track every campaign, lead, and download in a local SQLite database
-
-All stages are orchestrated through the **Quinx GUI** — a FastAPI backend + React frontend running locally. The interface utilizes a high-performance **Obsidian & Matrix Technical-Noir** dark theme optimized for dense data tracking. Each stage runs as a background thread with live log streaming and a Stop button.
-
----
-
-## 💰 What Quinx Replaces
-
 <p align="center">
-  <img src="docs/replaces.png" alt="Paid tools Quinx replaces" width="700"/>
+  <img src="quinx-gui/frontend/src/assets/hero.png" alt="Quinx Dashboard" width="700"/>
 </p>
 
-Quinx is a **self-hosted, open-source alternative** to an entire stack of expensive SaaS tools. Here's what you no longer need to pay for:
+---
+
+## What is Quinx?
+
+Quinx is a five-step cold outreach pipeline controlled through a local GUI dashboard. You set it up once and it handles everything — finding leads, writing personalised emails, and sending them.
+
+1. **Campaign** — Define your offer: product name, pitch, context, pricing, and your name
+2. **Scrape** — Search Google Maps for businesses and extract verified emails from their websites
+3. **Write** — AI reads each lead's website and writes a personalised cold email using your campaign details
+4. **Send** — Deliver emails via your own SMTP with human-like delays to protect your domain
+5. **Logs** — Track every campaign, download leads and emails as XLSX, delete old data
+
+Every step runs in the background with live log output, a progress bar, and a Stop button. Switching pages mid-run doesn't interrupt anything — state is preserved across navigation.
+
+---
+
+## What Quinx Replaces
+
+Quinx is a **self-hosted, open-source alternative** to an entire stack of expensive SaaS tools:
 
 ### Lead Scraping & Enrichment
 
 | Tool | What It Does | Monthly Cost | Quinx Replacement |
 |------|-------------|:------------:|-------------------|
-| <img src="https://img.shields.io/badge/Apollo.io-5C5CFF?style=flat&logo=apollo-graphql&logoColor=white" alt="Apollo"/> | Lead database & prospecting | **$99/mo** | `Email_Scrap` — Google Maps scraping + email extraction |
-| <img src="https://img.shields.io/badge/Hunter.io-FF4F00?style=flat&logoColor=white" alt="Hunter"/> | Email finder & verifier | **$49/mo** | `scrape_website_emails.py` — regex + BeautifulSoup extraction |
-| <img src="https://img.shields.io/badge/ZoomInfo-00A1E0?style=flat&logoColor=white" alt="ZoomInfo"/> | B2B data enrichment | **$250/mo** | `enrich_lead.py` — website context scraping + Schema.org parsing |
+| Apollo.io | Lead database & prospecting | **$99/mo** | `Email_Scrap` — Google Maps + email extraction |
+| Hunter.io | Email finder & verifier | **$49/mo** | `scrape_website_emails.py` — regex + BeautifulSoup |
+| ZoomInfo | B2B data enrichment | **$250/mo** | `enrich_lead.py` — website context + Schema.org |
 
 ### AI Email Writing
 
 | Tool | What It Does | Monthly Cost | Quinx Replacement |
 |------|-------------|:------------:|-------------------|
-| <img src="https://img.shields.io/badge/Jasper_AI-000000?style=flat&logoColor=white" alt="Jasper"/> | AI copywriting assistant | **$49/mo** | `write_email.py` — multi-model AI with strict quality rules |
-| <img src="https://img.shields.io/badge/Copy.ai-7C3AED?style=flat&logoColor=white" alt="Copy.ai"/> | AI marketing copy generator | **$49/mo** | Same — rule-bound AI with auto-retry & validation |
+| Jasper AI | AI copywriting assistant | **$49/mo** | `write_email.py` — multi-model AI with quality rules |
+| Copy.ai | AI marketing copy | **$49/mo** | Same — auto-retry & validation built in |
 
-### Cold Email Sending & Campaigns
+### Cold Email Sending
 
 | Tool | What It Does | Monthly Cost | Quinx Replacement |
 |------|-------------|:------------:|-------------------|
-| <img src="https://img.shields.io/badge/Instantly.ai-5B60E0?style=flat&logoColor=white" alt="Instantly"/> | Cold email at scale | **$30/mo** | `Email_Sender` — SMTP delivery with human-like delays |
-| <img src="https://img.shields.io/badge/Lemlist-FF4F64?style=flat&logoColor=white" alt="Lemlist"/> | Personalized outreach | **$59/mo** | Full pipeline — scrape, personalize, send |
-| <img src="https://img.shields.io/badge/Mailshake-4A90D9?style=flat&logoColor=white" alt="Mailshake"/> | Sales engagement platform | **$58/mo** | Quinx GUI — end-to-end orchestration |
-| <img src="https://img.shields.io/badge/Woodpecker-6DB33F?style=flat&logoColor=white" alt="Woodpecker"/> | Cold email automation | **$49/mo** | SMTP delivery with send-folder verification |
+| Instantly.ai | Cold email at scale | **$30/mo** | `Email_Sender` — SMTP with human-like delays |
+| Lemlist | Personalised outreach | **$59/mo** | Full pipeline — scrape, personalise, send |
+| Mailshake | Sales engagement | **$58/mo** | Quinx GUI — end-to-end orchestration |
+| Woodpecker | Cold email automation | **$49/mo** | SMTP delivery with send-folder verification |
 
-### 💸 Total Savings
+### Total Savings
 
 ```
 Monthly SaaS cost:   $693/mo  →  $8,316/year
 Quinx cost:          $0/mo    (self-hosted, bring your own API keys)
-─────────────────────────────────────────────────
+─────────────────────────────────────────────
 You save:            ~$8,000+/year
 ```
 
-> **Note:** Quinx only costs the API usage fees you'd pay anyway — Google Maps API (~$0.01/search), OpenRouter (~$0.001/email), and your own SMTP server.
+> Quinx only costs what you'd pay anyway — Google Maps API (~$0.01/search), OpenRouter (~$0.001/email), and your own SMTP server.
 
 ---
 
-## 🎛️ Technical-Noir Aesthetics
-
-Quinx abandons soft, playful "SaaS" UI designs in favor of an **Obsidian and Matrix Technical-Noir** aesthetic. Built for operators focused on speed, the interface mirrors an industrial-grade terminal system.
-
-<p align="center">
-  <img src="https://via.placeholder.com/800x300/161618/00FF41?text=STDOUT_LOG_STREAM_EMULATION" alt="Quinx AI Logs" width="700"/>
-</p>
-
-* **Terminal-Based Landing**: The public-facing module (`/`) renders an autonomous terminal directly in the browser.
-* **Pitch-Black Bento Grids**: High-contrast, sharp-cornered modules structure data with extreme clarity.
-* **Live STDOUT Emulation**: Asynchronous background operations stream raw execution data directly into your dashboard as it happens, with precise `[INFO]`, `[SUCCESS]`, and `[ERROR]` console outputs.
-
----
-
-## 🏗️ Architecture
+## Architecture
 
 ```
 Quinx/
-├── Email_Scrap/             # Stage 2: Lead generation
+├── Email_Scrap/             # Step 2: Lead generation
 │   ├── tools/
-│   │   ├── pipeline.py          # Scraper entry point (called by GUI)
+│   │   ├── pipeline.py              # Scraper entry point (called by GUI)
 │   │   ├── google_maps_search.py
-│   │   ├── scrape_website_emails.py
+│   │   ├── scrape_website_emails.py  # --max-emails N stops once N emails found
 │   │   ├── build_leads_csv.py
 │   │   └── ...
 │   └── .env.example
-├── Email_Writer/            # Stage 3: AI email generation
+├── Email_Writer/            # Step 3: AI email generation
 │   ├── tools/
-│   │   ├── batch_write_emails.py  # Writer entry point (called by GUI)
+│   │   ├── batch_write_emails.py    # Writer entry point (called by GUI)
 │   │   ├── enrich_lead.py
 │   │   ├── write_email.py
 │   │   └── ...
 │   └── .env.example
-├── Email_Sender/            # Stage 4: Email delivery
+├── Email_Sender/            # Step 4: Email delivery
 │   ├── src/
-│   │   ├── index.js             # Sender entry point (called by GUI)
-│   │   ├── hostinger.js
-│   │   ├── mailer.js
+│   │   ├── index.js                 # Sender entry point (called by GUI)
 │   │   └── ...
 │   └── .env.example
-├── quinx-gui/               # 🖥️ GUI Control Panel (primary interface)
+├── quinx-gui/               # GUI Control Panel (primary interface)
 │   ├── backend/             # FastAPI + SQLAlchemy + SQLite
-│   │   ├── main.py              # FastAPI app, CORS, router registration
+│   │   ├── main.py
 │   │   ├── api/
-│   │   │   ├── campaigns.py     # Campaign config CRUD + DB campaign routes
-│   │   │   ├── scraper.py       # Launches Email_Scrap/tools/pipeline.py
-│   │   │   ├── writer.py        # Launches Email_Writer/tools/batch_write_emails.py
-│   │   │   ├── sender.py        # Launches Email_Sender/src/index.js
-│   │   │   ├── users.py         # /me, email account settings
+│   │   │   ├── campaigns.py
+│   │   │   ├── scraper.py
+│   │   │   ├── writer.py
+│   │   │   ├── sender.py
+│   │   │   ├── users.py
 │   │   │   └── auth.py
 │   │   ├── core/
-│   │   │   ├── task_store.py    # In-memory threading task store (replaces Celery)
-│   │   │   ├── models.py        # SQLAlchemy ORM models
-│   │   │   ├── database.py      # SQLite engine + SessionLocal
-│   │   │   └── security.py      # JWT auth + credential encryption
-│   │   ├── campaign_configs/    # Reusable campaign JSON files
-│   │   ├── exports/             # leads.xlsx + emails.xlsx per campaign
-│   │   └── venv/
-│   └── frontend/            # React 19 + Vite + Tailwind CSS v3
+│   │   │   ├── task_store.py        # Background threading (no Redis/Celery)
+│   │   │   ├── models.py
+│   │   │   ├── database.py
+│   │   │   └── security.py         # JWT + credential encryption
+│   │   ├── campaign_configs/        # Reusable campaign JSON files
+│   │   └── exports/                 # leads.xlsx + emails.xlsx per campaign
+│   └── frontend/            # React 19 + Vite + Tailwind CSS
 │       └── src/
 │           ├── App.tsx
-│           ├── lib/api.ts        # Fetch wrapper (GET, POST, DELETE, download)
+│           ├── lib/
+│           │   ├── api.ts            # Fetch wrapper
+│           │   ├── scraperStore.tsx  # Global scraper state (persists across pages)
+│           │   ├── writerStore.tsx   # Global writer state (persists across pages)
+│           │   └── senderStore.tsx   # Global sender state (persists across pages)
 │           ├── pages/
-│           │   ├── LandingPage.tsx   # Public-facing B2B terminal presentation
-│           │   ├── Campaign.tsx  # Step 1: Service/campaign config manager
-│           │   ├── Scraper.tsx   # Step 2: Lead scraping with live logs + Stop
-│           │   ├── Writer.tsx    # Step 3: AI email generation with live logs + Stop
-│           │   ├── Sender.tsx    # Step 4: SMTP dispatch with live logs + Stop
-│           │   └── Logs.tsx      # Step 5: Campaign audit, delete, XLSX download
+│           │   ├── LandingPage.tsx
+│           │   ├── Campaign.tsx
+│           │   ├── Scraper.tsx
+│           │   ├── Writer.tsx
+│           │   ├── Sender.tsx
+│           │   └── Logs.tsx
 │           └── components/
 │               └── Sidebar.tsx
-└── docs/                    # Documentation assets
+└── docs/
 ```
 
 ---
 
-## 🔄 Pipeline Flow
+## Pipeline Flow
 
 ```mermaid
 graph LR
-    A["⚡ Campaign Config<br/>Define service & sender"] --> B["🔍 Email_Scrap<br/>Google Maps + Website Scraping"]
-    B --> C["✍️ Email_Writer<br/>OpenRouter + Anthropic AI"]
-    C --> D["🚀 Email_Sender<br/>SMTP Delivery"]
-    D --> E["📊 Logs<br/>SQLite + XLSX Export"]
+    A["⚡ Campaign<br/>Set your offer"] --> B["🔍 Scrape<br/>Google Maps + Email Extraction"]
+    B --> C["✍️ Write<br/>AI Personalised Emails"]
+    C --> D["🚀 Send<br/>SMTP Delivery"]
+    D --> E["📊 Logs<br/>Download & Track"]
 
     style A fill:#1a1a2e,stroke:#00ff88,color:#00ff88
     style B fill:#1a1a2e,stroke:#00ff88,color:#00ff88
@@ -172,42 +157,37 @@ graph LR
     style E fill:#1a1a2e,stroke:#00ff88,color:#00ff88
 ```
 
-### How It Works
-
-| Stage | What Happens | Key Tech |
-|-------|-------------|----------|
-| **1. Campaign** | Define service name, tagline, context, pricing, sender name — saved as a reusable JSON config | React form, FastAPI file store |
-| **2. Scrape** | Search Google Maps for businesses → scrape their websites for emails, phones, owner names → store in SQLite + XLSX | Google Places API, BeautifulSoup, Regex |
-| **3. Write** | Load leads XLSX → enrich each lead with website context → generate personalized emails with strict quality rules → save emails XLSX | OpenRouter (key rotation, multi-model) + Anthropic backup |
-| **4. Send** | Load emails XLSX → send via Hostinger SMTP with human-like random delays | Node.js, SMTP (Hostinger :465) |
+| Step | What Happens | Key Tech |
+|------|-------------|----------|
+| **1. Campaign** | Define service name, pitch, context, pricing, your name — saved as a reusable JSON | React form, FastAPI file store |
+| **2. Scrape** | Search Google Maps → scrape websites for emails → store in SQLite + XLSX. Stops as soon as the target email count is hit (`--max-emails N`) | Google Places API, BeautifulSoup, Regex |
+| **3. Write** | Load leads → AI reads each website → writes a personalised email per lead → saves emails XLSX | OpenRouter (key rotation, multi-model) + Anthropic backup |
+| **4. Send** | Load emails → send via SMTP with human-like random delays between each | Hostinger SMTP :465 |
 | **5. Logs** | Browse all campaigns, download leads/emails XLSX, delete campaigns | SQLite, FastAPI, openpyxl |
 
-Each stage runs as a **background thread** — the GUI polls for status every 2 seconds and streams live logs. Every stage has a **Stop** button that kills the subprocess.
+Each step runs as a **background thread** — the GUI polls every 2 seconds and streams live logs. Every step has a **Stop** button and a **progress bar**. Navigating away from a page mid-run does not stop the process — job state is kept alive in React Context providers.
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - **Python 3.12+**
-- **Node.js 18+** with npm
-- API keys (see [Configuration](#️-configuration))
+- **Node.js 18+**
+- API keys (see [Configuration](#configuration))
 
-### 1. Clone the Repository
+### 1. Clone
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Quinx.git
+git clone https://github.com/Oxirane-git/Quinx.git
 cd Quinx
 ```
 
-### 2. Set Up Tool Environment Files
+### 2. Set Up Environment Files
 
 ```bash
-# Email Scraper keys
 cp Email_Scrap/.env.example Email_Scrap/.env
-
-# Email Writer keys
 cp Email_Writer/.env.example Email_Writer/.env
 ```
 
@@ -230,7 +210,7 @@ cd ../../Email_Sender
 npm install
 ```
 
-### 4. Start the GUI
+### 4. Start
 
 Open **two terminals**:
 
@@ -245,35 +225,33 @@ cd quinx-gui/frontend
 npm run dev
 ```
 
-Then open **http://localhost:5173** in your browser.
+Open **http://localhost:5173** in your browser.
 
 ### 5. Workflow
 
-1. **Campaign** → Create a campaign config (service name, tagline, context, pricing, sender name)
-2. **Scraper** → Enter a niche + cities → click **EXECUTE_SCAN** → watch live logs
-3. **Writer** → Select the campaign and config → click **EXECUTE_GENERATION** → live log streams
-4. **Sender** → Add an SMTP account in Settings → select campaign → click **INITIATE_DISPATCH**
+1. **Campaign** → Create a campaign (your product name, pitch, context, pricing, your name)
+2. **Scrape** → Enter a business type + cities → click **Start Scraping** → watch live logs
+3. **Write** → Select the campaign → click **Start Writing** → AI writes personalised emails
+4. **Send** → Add an SMTP account in Settings → select campaign → click **Send Emails**
 5. **Logs** → Download leads/emails XLSX, delete old campaigns
 
 ---
 
-## 🖥️ GUI Modules
+## GUI Pages
 
-| Module | Route | Description |
-|--------|-------|-------------|
-| **🏠 Home** | `/` | B2B terminal-styled Landing Page outlining capabilities and autonomous workflows. |
-| **⚡ Campaign** | `/campaign` | Create and manage campaign configs — service name, tagline, context, pricing, sender — stored as JSON in `campaign_configs/` |
-| **🔍 Scraper** | `/scraper` | Set niche + cities + limit → run `Email_Scrap/tools/pipeline.py` → live log output → leads saved to SQLite + XLSX |
-| **✍️ Writer** | `/writer` | Select campaign + config → run `Email_Writer/tools/batch_write_emails.py` → live log output → emails XLSX saved |
-| **🚀 Sender** | `/sender` | Select campaign + SMTP account → run `Email_Sender/src/index.js` → live log output |
-| **📊 Logs** | `/logs` | View all campaigns, lifecycle status, download leads/emails XLSX, delete per-row or clear all |
-| **⚙️ Settings** | `/settings` | Add SMTP email accounts (encrypted in DB), view API spend |
-
-> Every module streams real-time subprocess output and exposes a **Stop** button that kills the running process.
+| Page | Route | Description |
+|------|-------|-------------|
+| **Home** | `/` | Landing page — overview of what Quinx does |
+| **Campaign** | `/campaign` | Create and manage campaigns — offer details saved as JSON |
+| **Scrape** | `/scraper` | Set niche + cities + email target → scrape → download leads XLSX |
+| **Write** | `/writer` | Select campaign → AI writes personalised emails → download emails XLSX |
+| **Send** | `/sender` | Select campaign + SMTP account → send with delays → live log |
+| **Logs** | `/logs` | All campaigns, lifecycle status, download buttons, delete |
+| **Settings** | `/settings` | Add SMTP accounts (encrypted), view AI spend |
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Email_Scrap (`Email_Scrap/.env`)
 
@@ -285,85 +263,82 @@ Then open **http://localhost:5173** in your browser.
 
 | Variable | Description |
 |----------|-------------|
-| `OPENROUTER_API_KEY_1` | OpenRouter API key (primary) |
-| `OPENROUTER_API_KEY_2` | Fallback key — auto-rotated on rate limits |
-| `OPENROUTER_API_KEY_3` | Fallback key — auto-rotated on rate limits |
-| `OPENROUTER_API_KEY_4` | Fallback key — auto-rotated on rate limits |
-| `ANTHROPIC_API_KEY` | Anthropic key (used when all OpenRouter keys exhausted) |
+| `OPENROUTER_API_KEY_1` | Primary OpenRouter key |
+| `OPENROUTER_API_KEY_2–4` | Fallback keys — auto-rotated on rate limits |
+| `ANTHROPIC_API_KEY` | Used when all OpenRouter keys are exhausted |
 
 ### Quinx GUI Backend (`quinx-gui/backend/.env`)
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `QUINX_BASE_DIR` | Absolute path to the Quinx repo root | `C:/Users/Sahil/Desktop/Quinx` |
-| `SECRET_KEY` | JWT signing secret | change in production |
+| Variable | Description |
+|----------|-------------|
+| `QUINX_BASE_DIR` | Absolute path to the Quinx repo root |
+| `SECRET_KEY` | JWT signing secret |
 
-### SMTP Accounts
-
-SMTP credentials (email, host, port, password) are added through the **Settings** page in the GUI. They are stored **encrypted** in the SQLite database — not in `.env` files. The sender backend decrypts them at runtime and passes them to the Node.js sender as environment variables.
+SMTP credentials are added through the **Settings** page and stored encrypted in SQLite — not in `.env` files.
 
 ---
 
-## 📧 Email Quality Rules
+## Email Quality Rules
 
-The AI writer enforces strict rules to ensure high deliverability and engagement:
+The AI writer enforces strict rules on every email:
 
 | Rule | Constraint |
 |------|-----------|
-| **Subject line** | < 9 words, no spam triggers |
+| **Subject line** | Under 9 words, no spam triggers |
 | **Body length** | 90–130 words |
-| **Personalization** | Must reference the business name |
+| **Personalization** | Must reference the business by name |
 | **Tone** | Conversational, no corporate speak |
-| **Retry** | Auto-retries with correction prompt on rule violations |
+| **Retry** | Auto-retries with a correction prompt on rule violations |
 | **Fallback** | Anthropic API used when all OpenRouter keys are exhausted |
 
 ---
 
-## 🛡️ Safety Features
+## Safety Features
 
-- **⏱️ Human-like delays** — Configurable min/max delay (seconds) between emails
-- **🔄 Resume support** — Writer accepts `--start-from` to resume interrupted batches
-- **🔑 API key rotation** — Auto-rotates OpenRouter keys on rate limits, falls back to Anthropic
-- **✅ Email validation** — Strict AI output validation with auto-retry before saving
-- **🔒 Encrypted credentials** — SMTP passwords encrypted in the database, never stored in plaintext
-- **🛑 Stop button** — Every pipeline stage can be cancelled mid-run; subprocess is killed immediately
+- **Human-like delays** — Configurable min/max delay (seconds) between emails
+- **Exact email targeting** — `--max-emails N` stops scraping as soon as N valid emails are found
+- **API key rotation** — Auto-rotates OpenRouter keys on rate limits, falls back to Anthropic
+- **Email validation** — AI output validated and auto-retried before saving
+- **Encrypted credentials** — SMTP passwords encrypted in the database, never plaintext
+- **Stop button** — Every pipeline step can be cancelled mid-run
 
 ---
 
-## 🗄️ Database
+## Database
 
-Quinx uses **SQLite** for zero-config data persistence, managed by the GUI backend:
+Quinx uses **SQLite** — no setup required:
 
 | Table | Purpose |
 |-------|---------|
-| `campaigns` | Campaign name, niche, status, timestamps |
-| `leads` | Scraped business contacts linked to campaigns |
-| `email_accounts` | SMTP account credentials (encrypted) |
-| `users` | Operator account, API spend tracking |
+| `campaigns` | Name, niche, status, timestamps |
+| `leads` | Scraped contacts linked to campaigns |
+| `email_accounts` | SMTP credentials (encrypted) |
+| `users` | Account info, API spend tracking |
 
-XLSX exports (leads + emails) are stored in `quinx-gui/backend/exports/` named `{campaign_id}_leads.xlsx` and `{campaign_id}_emails.xlsx`.
+XLSX exports are stored in `quinx-gui/backend/exports/` as `{id}_leads.xlsx` and `{id}_emails.xlsx`.
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | **Lead Scraping** | Python, Google Maps Places API, BeautifulSoup, Regex |
-| **Email Writing** | Python, OpenRouter (multi-model, key rotation), Anthropic backup, openpyxl |
-| **Email Sending** | Node.js, Nodemailer, SMTP (Hostinger :465) |
-| **GUI Backend** | FastAPI, SQLAlchemy, SQLite, threading (background tasks) |
-| **GUI Frontend** | React 19, Vite, Tailwind CSS v3, React Router, TypeScript |
-| **Task System** | In-memory task store with threading.Lock (no Redis/Celery required) |
+| **Email Writing** | Python, OpenRouter (multi-model, key rotation), Anthropic, openpyxl |
+| **Email Sending** | Node.js, Nodemailer, Hostinger SMTP :465 |
+| **GUI Backend** | FastAPI, SQLAlchemy, SQLite, threading |
+| **GUI Frontend** | React 19, Vite, Tailwind CSS v3, TypeScript, React Router |
+| **State Management** | React Context (ScraperProvider, WriterProvider, SenderProvider) |
+| **Task System** | In-memory task store with threading.Lock — no Redis or Celery needed |
 
 ---
 
-## 📄 License
+## License
 
 This project is private. All rights reserved.
 
 ---
 
 <p align="center">
-  Built with 💚 by <strong>Quinx AI</strong>
+  Built by <strong>Quinx</strong>
 </p>

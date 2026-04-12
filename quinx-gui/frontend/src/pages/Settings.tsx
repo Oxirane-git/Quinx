@@ -52,9 +52,9 @@ export default function Settings() {
    <header className="border-b border-divider pb-4">
     <div className="flex items-center space-x-3 mb-2">
      <SettingsIcon className="w-6 h-6 text-matrix" />
-     <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">SYSTEM_CONFIG</h1>
+     <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">Settings</h1>
     </div>
-    <p className="text-gray-400 text-sm pl-9">Configure core infrastructure integrations and operational parameters.</p>
+    <p className="text-gray-400 text-sm pl-9">Connect your email account and manage your API usage.</p>
    </header>
 
    <div className="space-y-8 font-mono">
@@ -63,7 +63,7 @@ export default function Settings() {
      <div className="absolute top-0 right-0 w-32 h-32 bg-matrix/5 rounded-bl-[100px] pointer-events-none"></div>
      <h2 className="text-lg font-bold mb-6 flex items-center gap-3 tracking-wider uppercase">
       <Mail className="w-5 h-5 text-matrix" />
-      OUTBOUND_RELAYS
+      Email Accounts
      </h2>
 
      {/* Connected accounts list */}
@@ -84,13 +84,13 @@ export default function Settings() {
        onClick={() => setProvider('smtp')}
        className={`px-5 py-2.5 text-xs font-bold uppercase tracking-widest border transition-colors ${provider === 'smtp' ? 'border-matrix text-obsidian bg-matrix shadow-[inset_0_0_10px_rgba(255,255,255,0.2)]' : 'border-divider text-gray-400 bg-obsidian hover:text-white hover:border-gray-500'}`}
       >
-       RAW_IMAP/SMTP
+       SMTP
       </button>
       <button
        onClick={() => setProvider('gmail')}
        className={`px-5 py-2.5 text-xs font-bold uppercase tracking-widest border transition-colors ${provider === 'gmail' ? 'border-matrix text-obsidian bg-matrix shadow-[inset_0_0_10px_rgba(255,255,255,0.2)]' : 'border-divider text-gray-400 bg-obsidian hover:text-white hover:border-gray-500'}`}
       >
-       GOOGLE_OAUTH
+       Gmail / OAuth
       </button>
      </div>
 
@@ -104,7 +104,7 @@ export default function Settings() {
         </div>
        </div>
        <div>
-        <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-widest">Port Binding</label>
+        <label className="block text-[10px] text-gray-500 mb-1 uppercase tracking-widest">Port</label>
         <input type="number" value={port} onChange={e => setPort(e.target.value)} placeholder="465" required className="w-full bg-black border border-zinc-800 p-2.5 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white placeholder-gray-600" />
        </div>
        <div>
@@ -120,14 +120,14 @@ export default function Settings() {
        </div>
        {saveMsg && <p className={`text-[11px] px-4 py-2 border uppercase tracking-wider ${saveMsg.includes('success') ? 'text-matrix border-matrix/30 bg-matrix/5' : 'text-red-500 border-red-500/30 bg-red-900/10'}`}>{saveMsg}</p>}
        <button type="submit" disabled={saving} className="bg-matrix hover:bg-matrix-hover text-obsidian w-full py-3 text-sm font-bold transition-all disabled:opacity-50 tracking-wider shadow-[0_0_10px_rgba(0,255,65,0.15)] mt-4">
-        {saving ? 'ESTABLISHING HANDSHAKE...' : 'DEPLOY_CONNECTION()'}
+        {saving ? 'Saving...' : 'Save Account'}
        </button>
       </form>
      ) : (
       <div className="py-4">
        <div className="text-xs text-gray-500 border border-divider bg-obsidian px-5 py-4 max-w-sm tracking-wide leading-relaxed">
         <span className="text-yellow-500 font-bold block mb-2 uppercase">WARNING: Not Configured</span>
-        Google OAuth flow not yet configured on the server block. Add your Google OAuth credentials to the backend <span className="text-white font-mono">.env</span> to initialize this module.
+        Google OAuth is not set up yet. Add your Google OAuth credentials to the backend <span className="text-white font-mono">.env</span> file to enable this.
        </div>
       </div>
      )}
@@ -138,11 +138,11 @@ export default function Settings() {
      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-[100px] pointer-events-none"></div>
      <h2 className="text-lg font-bold mb-6 flex items-center gap-3 tracking-wider uppercase">
       <Cpu className="w-5 h-5 text-blue-400" />
-      OPENROUTER / LLM_SATELLITE
+      AI Usage (OpenRouter)
      </h2>
      <div className="flex justify-between items-center text-sm bg-obsidian p-6 border border-divider shadow-inner max-w-2xl">
       <div>
-       <span className="text-gray-500 uppercase tracking-widest text-[10px] block mb-2">Total Compute Expenditure</span>
+       <span className="text-gray-500 uppercase tracking-widest text-[10px] block mb-2">Amount Spent</span>
        <div className="text-3xl font-bold mt-1 text-white flex items-baseline gap-2">
         {userMe ? (
          <>
@@ -155,9 +155,9 @@ export default function Settings() {
        </div>
       </div>
       <div className="text-right border-l border-divider pl-6">
-       <span className="text-gray-500 uppercase tracking-widest text-[10px] block mb-3">Hard Limit Policy</span>
+       <span className="text-gray-500 uppercase tracking-widest text-[10px] block mb-3">Monthly Limit</span>
        <button disabled className="text-xs border text-red-500 border-red-500/30 bg-red-900/10 px-4 py-2 cursor-not-allowed font-bold tracking-wider">
-        ADMINISTRATOR_LOCK
+        Admin Only
        </button>
       </div>
      </div>

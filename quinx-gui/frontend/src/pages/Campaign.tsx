@@ -88,7 +88,7 @@ const Campaign = () => {
         }
     };
 
-    const field = (label, key, type = 'input', placeholder = '') => (
+    const field = (label: string, key: keyof typeof form, type = 'input', placeholder = '') => (
         <div className="flex flex-col space-y-2">
             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">
                 {label}
@@ -119,10 +119,10 @@ const Campaign = () => {
             <header className="pb-4 border-b border-divider">
                 <div className="flex items-center space-x-3 mb-2">
                     <Zap className="text-matrix w-6 h-6" />
-                    <h1 className="text-2xl font-bold font-mono tracking-tight uppercase text-white">CAMPAIGN_CONFIG</h1>
+                    <h1 className="text-2xl font-bold font-mono tracking-tight uppercase text-white">Campaigns</h1>
                 </div>
                 <p className="text-gray-400 text-sm font-sans pl-9">
-                    Define the service framework. Each campaign object is injected into the Gemini evaluation prompt.
+                    Set up your offer details. This context is used by the AI to write personalised emails.
                 </p>
             </header>
 
@@ -132,18 +132,18 @@ const Campaign = () => {
                 <div className="col-span-4 bg-gunmetal border border-divider rounded-none flex flex-col overflow-hidden bento-hover">
                     <div className="h-1 bg-matrix w-full flex-shrink-0" />
                     <div className="px-5 py-4 border-b border-divider flex items-center justify-between flex-shrink-0 bg-obsidian">
-                        <span className="text-xs font-bold font-mono text-gray-400 tracking-wider">SAVED_DIRECTORIES</span>
+                        <span className="text-xs font-bold font-mono text-gray-400 tracking-wider">Saved Campaigns</span>
                         <button
                             onClick={startNew}
                             className="flex items-center space-x-1 text-matrix hover:text-matrix-hover transition-colors text-xs font-bold font-mono uppercase"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>MKNODE</span>
+                            <span>New</span>
                         </button>
                     </div>
                     <div className="flex-1 overflow-y-auto py-2">
                         {campaigns.length === 0 && (
-                            <p className="text-gray-500 text-xs font-mono px-5 py-4">No directories found in registry.</p>
+                            <p className="text-gray-500 text-xs font-mono px-5 py-4">No campaigns yet. Create one to get started.</p>
                         )}
                         {campaigns.map((c) => (
                             <div
@@ -180,7 +180,7 @@ const Campaign = () => {
                     <div className="px-6 py-5 border-b border-divider flex items-center justify-between flex-shrink-0 bg-obsidian">
                         <h2 className="text-sm font-bold font-mono text-white uppercase flex items-center gap-2">
                             <span className="w-2 h-2 bg-matrix"></span>
-                            {isNew ? 'NEW_CAMPAIGN_NODE' : selected ? `MOUNTED: ${selected}` : 'AWAITING_SELECTION'}
+                            {isNew ? 'New Campaign' : selected ? selected : 'Select a campaign'}
                         </h2>
                         {msg && (
                             <span className={`text-xs font-mono font-bold px-3 py-1 bg-obsidian border ${msg.type === 'success' ? 'text-matrix border-matrix/30' : 'text-red-500 border-red-500/30'}`}>
@@ -194,41 +194,41 @@ const Campaign = () => {
                             <div className="flex-1 overflow-y-auto px-8 py-8 space-y-8 bg-gunmetal">
 
                                 <div className="grid grid-cols-2 gap-6">
-                                    {field('Campaign Alias', 'campaignName', 'input', 'e.g. Quinx AI — Enterprise')}
-                                    {field('Sender Identity', 'senderName', 'input', 'e.g. Sahil')}
+                                    {field('Campaign Name', 'campaignName', 'input', 'e.g. NYC Restaurants — April')}
+                                    {field('Your Name', 'senderName', 'input', 'e.g. Alex')}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-6">
-                                    {field('Platform Vector', 'serviceName', 'input', 'e.g. Quinx AI')}
-                                    {field('Domain Vector', 'serviceWebsite', 'input', 'e.g. quinxai.com')}
+                                    {field('Your Product / Service', 'serviceName', 'input', 'e.g. CleanDesk Pro')}
+                                    {field('Your Website', 'serviceWebsite', 'input', 'e.g. cleandesk.io')}
                                 </div>
 
                                 {field(
-                                    'Value Proposition',
+                                    'One-line pitch',
                                     'serviceTagline',
                                     'input',
-                                    'One sentence core feature constraint'
+                                    'e.g. We help restaurants automate guest follow-ups'
                                 )}
 
                                 {field(
-                                    'Context Array',
+                                    'What you offer (used by AI)',
                                     'serviceContext',
                                     'textarea',
-                                    'Bullet points describing mechanics\nExecution parameters\nKey metrics'
+                                    'Describe what your product does, who it helps, and what problem it solves...'
                                 )}
 
-                                {field('Pricing Schema', 'pricing', 'input', 'e.g. ₹3,999/month or $99/month')}
+                                {field('Pricing', 'pricing', 'input', 'e.g. ₹3,999/month or $99/month')}
 
                                 <div className="bg-black border border-zinc-800 rounded-none p-5 text-xs text-gray-400 space-y-2 font-mono mt-8">
                                     <p className="text-matrix font-bold mb-3 uppercase flex items-center gap-2">
-                                        <ChevronRight className="w-4 h-4" /> Injection Map:
+                                        <ChevronRight className="w-4 h-4" /> How the AI uses these fields:
                                     </p>
                                     <div className="grid grid-cols-2 gap-2">
-                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceName}}'}</span> → Target Platform</p>
-                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceTagline}}'}</span> → Core Proposition</p>
-                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceContext}}'}</span> → Multi-line Block</p>
-                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{senderName}}'}</span> → Terminal Signature</p>
-                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceWebsite}}'}</span> → Terminal Domain</p>
+                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceName}}'}</span> → Product name in email</p>
+                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceTagline}}'}</span> → Opening hook</p>
+                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceContext}}'}</span> → Email body context</p>
+                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{senderName}}'}</span> → Sign-off name</p>
+                                        <p><span className="text-gray-600 bg-gunmetal px-1">{'{{serviceWebsite}}'}</span> → Link in email</p>
                                     </div>
                                 </div>
 
@@ -245,7 +245,7 @@ const Campaign = () => {
                                         }`}
                                 >
                                     <Save className={`w-4 h-4 ${!saving && 'group-hover:scale-110 transition-transform'}`} />
-                                    <span>{saving ? 'COMMIT_IN_PROGRESS...' : 'COMMIT_CHANGES()'}</span>
+                                    <span>{saving ? 'Saving...' : 'Save Campaign'}</span>
                                 </button>
                             </div>
                         </>
@@ -253,7 +253,7 @@ const Campaign = () => {
                         <div className="flex-1 flex items-center justify-center text-gray-600 text-sm font-mono bg-gunmetal">
                             <div className="text-center space-y-4">
                                 <Terminal className="w-12 h-12 mx-auto stroke-1" />
-                                <p className="uppercase tracking-widest text-xs">NO_ROOT_NODE_ATTACHED</p>
+                                <p className="uppercase tracking-widest text-xs">Select or create a campaign</p>
                             </div>
                         </div>
                     )}

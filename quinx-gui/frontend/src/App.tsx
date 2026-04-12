@@ -8,6 +8,8 @@ import Logs from './pages/Logs';
 import Campaign from './pages/Campaign';
 import LandingPage from './pages/LandingPage';
 import { ScraperProvider } from './lib/scraperStore';
+import { WriterProvider } from './lib/writerStore';
+import { SenderProvider } from './lib/senderStore';
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +26,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
 function App() {
  return (
   <ScraperProvider>
+  <WriterProvider>
+  <SenderProvider>
   <Router>
     <Routes>
       <Route path="/" element={<LandingPage />} />
@@ -35,6 +39,8 @@ function App() {
       <Route path="/logs" element={<DashboardLayout><Logs /></DashboardLayout>} />
     </Routes>
   </Router>
+  </SenderProvider>
+  </WriterProvider>
   </ScraperProvider>
  );
 }

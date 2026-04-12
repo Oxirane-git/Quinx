@@ -1,7 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../lib/api';
 import { useScraperStore } from '../lib/scraperStore';
-import { Target, Download, Server, ExternalLink } from 'lucide-react';
+import { Target, Download, Server, ExternalLink, Check } from 'lucide-react';
+
+const STEPS = [
+  { label: 'MAPS_SEARCH', desc: 'Querying Google Maps' },
+  { label: 'WEB_SCRAPE',  desc: 'Scraping websites'   },
+  { label: 'BUILD_CSV',   desc: 'Compiling leads'     },
+  { label: 'EXPORT',      desc: 'Writing output'      },
+];
+
+function deriveStep(logs: string[]): number {
+  const text = logs.join('\n');
+  if (text.includes('Step 4')) return 4;
+  if (text.includes('Step 3')) return 3;
+  if (text.includes('Step 2')) return 2;
+  if (text.includes('Step 1') || text.includes('[SEARCH]')) return 1;
+  return 0;
+}
 
 export default function Scraper() {
  const { logs, isRunning, downloadId, downloadName, startScrape, stopScrape } = useScraperStore();
@@ -11,6 +27,8 @@ export default function Scraper() {
  const [leadLimit, setLeadLimit] = useState(60);
  const [campaignName, setCampaignName] = useState('');
  const logEndRef = useRef<HTMLDivElement>(null);
+
+ const activeStep = isRunning ? deriveStep(logs) : (logs.some(l => l.includes('Task complete') || l.includes('SUCCESS')) ? 5 : 0);
 
  useEffect(() => {
   logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,9 +47,9 @@ export default function Scraper() {
     <header className="border-b border-divider pb-4">
      <div className="flex items-center space-x-3 mb-2">
       <Target className="w-6 h-6 text-matrix" />
-      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">LEAD_EXTRACTION</h1>
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">Find Leads</h1>
      </div>
-     <p className="text-gray-400 text-sm pl-9">Configure and deploy scraping spiders.</p>
+     <p className="text-gray-400 text-sm pl-9">Enter a niche and cities to scrape verified business emails.</p>
     </header>
 
     <form onSubmit={handleSubmit} className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
@@ -39,38 +57,38 @@ export default function Scraper() {
 
      <div className="space-y-4 font-mono">
       <div>
-       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">CAMPAIGN NAME (OPTIONAL)</label>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Campaign Name (optional)</label>
        <input
         type="text"
         value={campaignName}
         onChange={e => setCampaignName(e.target.value)}
         className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
-        placeholder="e.g. NYC_Restaurants_Q1"
+        placeholder="e.g. Austin_CoffeeShops_May"
        />
       </div>
       <div>
-       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET_INDUSTRY</label>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* Business Type</label>
        <input
         type="text"
         value={niche}
         onChange={e => setNiche(e.target.value)}
         className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
-        placeholder="e.g. Restaurants"
+        placeholder="e.g. Coffee Shops"
         required
        />
       </div>
       <div>
-       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* TARGET CITIES (CSV)</label>
+       <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* Cities</label>
        <textarea
         value={cities}
         onChange={e => setCities(e.target.value)}
         className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white resize-none h-24"
-        placeholder="New York, London, Tokyo..."
+        placeholder="Austin, Chicago, Miami..."
         required
        />
       </div>
       <div>
-       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">LEAD LIMIT PER CITY</label>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Emails to find per city</label>
        <input
         type="number"
         value={leadLimit}
@@ -88,7 +106,7 @@ export default function Scraper() {
        className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
       >
        <ExternalLink className="w-4 h-4" />
-       {isRunning ? 'SPIDERS_ACTIVE...' : 'DEPLOY_SPIDERS()'}
+       {isRunning ? 'Scraping...' : 'Start Scraping'}
       </button>
       {isRunning && (
        <button
@@ -108,7 +126,7 @@ export default function Scraper() {
        className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2"
       >
        <Download className="w-4 h-4" />
-       PULL_OUTPUT.XLSX
+       Download Leads (.xlsx)
       </button>
      )}
     </form>
@@ -120,7 +138,7 @@ export default function Scraper() {
     <div className="p-4 border-b border-divider bg-gunmetal/80 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500">
      <div className="flex items-center gap-2">
       <Server className="w-4 h-4" />
-      <span>STDOUT // Terminal</span>
+      <span>Live Output</span>
      </div>
      <div className="flex items-center gap-2">
       <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-matrix animate-pulse' : 'bg-gray-600'}`}></span>
@@ -130,7 +148,7 @@ export default function Scraper() {
 
     <div className="flex-1 p-5 overflow-y-auto font-mono text-xs max-w-full space-y-1.5 scrollbar-thin scrollbar-thumb-divider scrollbar-track-transparent">
      {logs.length === 0 ? (
-      <span className="text-gray-600 italic">Waiting for process dispatch...</span>
+      <span className="text-gray-600 italic">Output will appear here once you start scraping...</span>
      ) : (
       logs.map((l, i) => {
        const isError = l.includes('ERROR');
@@ -154,6 +172,69 @@ export default function Scraper() {
      )}
      <div ref={logEndRef} className="h-4" />
     </div>
+
+    {/* Pipeline progress — below terminal */}
+    {(isRunning || activeStep === 5) && (
+     <div className="border-t border-divider bg-gunmetal/80 px-5 py-4 space-y-3 font-mono flex-shrink-0">
+      <div className="flex items-center justify-between">
+       <span className="text-[10px] text-gray-500 uppercase tracking-widest">Pipeline Progress</span>
+       {activeStep === 5
+        ? <span className="text-[10px] text-matrix font-bold uppercase tracking-wider">COMPLETE</span>
+        : <span className="text-[10px] text-matrix animate-pulse font-bold uppercase tracking-wider">RUNNING...</span>
+       }
+      </div>
+
+      {/* Track bar */}
+      <div className="relative h-1 bg-divider w-full overflow-hidden">
+       <div
+        className="absolute left-0 top-0 h-full bg-matrix transition-all duration-700 ease-out shadow-[0_0_8px_rgba(0,255,65,0.6)]"
+        style={{ width: `${Math.min(100, (Math.max(0, activeStep - 1) / 4) * 100)}%` }}
+       />
+       {isRunning && activeStep > 0 && activeStep < 5 && (
+        <div
+         className="absolute top-0 h-full w-6 bg-gradient-to-r from-matrix to-transparent animate-pulse"
+         style={{ left: `${Math.min(95, (Math.max(0, activeStep - 1) / 4) * 100)}%` }}
+        />
+       )}
+      </div>
+
+      {/* Step nodes */}
+      <div className="flex justify-between">
+       {STEPS.map((step, i) => {
+        const stepNum = i + 1;
+        const done = activeStep > stepNum || activeStep === 5;
+        const active = activeStep === stepNum;
+        return (
+         <div key={step.label} className="flex flex-col items-center gap-1.5 flex-1">
+          <div className={`w-6 h-6 flex items-center justify-center border text-[10px] font-bold transition-all duration-300
+           ${done   ? 'border-matrix bg-matrix text-obsidian shadow-[0_0_8px_rgba(0,255,65,0.5)]' : ''}
+           ${active ? 'border-matrix text-matrix animate-pulse shadow-[0_0_12px_rgba(0,255,65,0.4)]' : ''}
+           ${!done && !active ? 'border-divider text-gray-600' : ''}
+          `}>
+           {done ? <Check className="w-3 h-3" /> : stepNum}
+          </div>
+          <span className={`text-[8px] uppercase tracking-wider text-center leading-tight transition-colors duration-300
+           ${done ? 'text-matrix' : active ? 'text-matrix/80' : 'text-gray-600'}
+          `}>
+           {step.label}
+          </span>
+         </div>
+        );
+       })}
+      </div>
+
+      {activeStep > 0 && activeStep < 5 && (
+       <p className="text-[10px] text-gray-500 text-center pt-1 border-t border-divider">
+        <span className="text-matrix">▶</span> {STEPS[activeStep - 1]?.desc}
+        <span className="inline-flex ml-1">
+         <span className="animate-[bounce_1s_infinite_0ms]">.</span>
+         <span className="animate-[bounce_1s_infinite_150ms]">.</span>
+         <span className="animate-[bounce_1s_infinite_300ms]">.</span>
+        </span>
+       </p>
+      )}
+     </div>
+    )}
    </div>
   </div>
  );

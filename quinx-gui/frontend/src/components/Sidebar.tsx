@@ -1,11 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Target, Pencil, Send, Database, Settings, LogOut, Zap, Terminal } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Target, Pencil, Send, Database, Settings, LogOut, Zap } from 'lucide-react';
+import logo from '../assets/logo/q__2_-removebg-preview.png';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { api } from '../lib/api';
 
 export default function Sidebar() {
  const location = useLocation();
+ const navigate = useNavigate();
  const [userName, setUserName] = useState(localStorage.getItem('userName') || 'Operator');
  const [balance, setBalance] = useState<string | null>(null);
  const [apiLimit, setApiLimit] = useState<string | null>(null);
@@ -32,17 +34,16 @@ export default function Sidebar() {
  const handleLogout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('userName');
-  window.location.reload();
+  navigate('/');
  };
 
  return (
   <aside className="w-64 border-r border-divider bg-obsidian/90 backdrop-blur-md flex flex-col justify-between relative z-20">
    <div>
     <div className="p-6 border-b border-divider bg-gunmetal">
-     <h1 className="text-xl font-bold text-pure-white tracking-tight flex items-center gap-2 font-mono">
-      <Terminal className="w-5 h-5 text-matrix" />
-      QUINX_AI
-     </h1>
+     <div className="flex items-center gap-3">
+      <img src={logo} alt="Q" className="h-10 w-10 object-contain opacity-90" />
+     </div>
     </div>
 
     <nav className="p-4 space-y-1">
@@ -58,13 +59,16 @@ export default function Sidebar() {
        )}
       >
        <item.icon size={16} />
-       {item.name.replace(/^[0-9]\.\s/, '').toUpperCase()}
+       {item.name.replace(/^[0-9]\.\s/, '')}
       </Link>
      ))}
     </nav>
    </div>
 
    <div className="p-4 border-t border-divider bg-gunmetal">
+    <div className="mb-3 pb-3 border-b border-divider">
+     <img src={logo} alt="Quinx" className="h-6 object-contain opacity-70" />
+    </div>
     <div className="flex gap-2 items-center text-xs mb-2 font-mono">
      <div className="flex flex-col flex-1">
       <span className="text-gray-500">[{userName}]</span>

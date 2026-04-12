@@ -209,6 +209,8 @@ def enrich_record(record: dict) -> dict:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True, help="Path to raw_places JSON file")
+    parser.add_argument("--max-emails", type=int, default=0,
+                        help="Stop once this many emails are found (0 = no limit)")
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
@@ -217,29 +219,53 @@ def main():
     output_path = args.input.replace("raw_places_", "enriched_")
 
     if os.path.exists(output_path) and os.path.getsize(output_path) > 10:
-        print(f"[SKIP] {output_path} already exists. Delete it to re-run.")
-        return
+        # If a max-emails target is set, check whether the existing file already meets it
+        if args.max_emails:
+            try:
+                with open(output_path, encoding="utf-8") as f:
+                    existing = json.load(f)
+                already = sum(1 for r in existing if r.get("email"))
+                if already >= args.max_emails:
+                    print(f"[SKIP] {output_path} already has {already} emails (target {args.max_emails}).")
+                    return
+                # Not enough emails — delete and re-scrape
+                os.remove(output_path)
+                print(f"[INFO] Re-scraping {output_path}: only {already}/{args.max_emails} emails found previously.")
+            except Exception:
+                os.remove(output_path)
+        else:
+            print(f"[SKIP] {output_path} already exists. Delete it to re-run.")
+            return
 
     with open(args.input, "r", encoding="utf-8") as f:
         records = json.load(f)
 
-    print(f"[INFO] Enriching {len(records)} records from {args.input}")
+    print(f"[INFO] Enriching {len(records)} records from {args.input}"
+          + (f" (target: {args.max_emails} emails)" if args.max_emails else ""))
     enriched = []
+    emails_found = 0
 
     for i, record in enumerate(records):
         print(f"  [{i + 1}/{len(records)}] {record.get('business_name', 'unknown')}"
-              f" -- {record.get('website', '(no website)')}")
-        enriched.append(enrich_record(record))
+              f" -- {record.get('website', '(no website)')} | emails so far: {emails_found}", flush=True)
+        result = enrich_record(record)
+        enriched.append(result)
+        if result.get("email"):
+            emails_found += 1
+            print(f"  [HIT] {result['email']} ({emails_found}"
+                  + (f"/{args.max_emails}" if args.max_emails else "") + ")", flush=True)
+            if args.max_emails and emails_found >= args.max_emails:
+                print(f"[INFO] Target of {args.max_emails} emails reached. Stopping early.", flush=True)
+                break
         if i < len(records) - 1:
             time.sleep(INTER_RECORD_DELAY)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(enriched, f, indent=2, ensure_ascii=False)
 
-    email_count = sum(1 for r in enriched if r.get("email"))
-    pct = (100 * email_count // len(enriched)) if enriched else 0
+    pct = (100 * emails_found // len(enriched)) if enriched else 0
     print(f"[DONE] Wrote {len(enriched)} records to {output_path}")
-    print(f"[INFO] Email hit rate: {email_count}/{len(enriched)} ({pct}%)")
+    print(f"[INFO] Email hit rate: {emails_found}/{len(enriched)} ({pct}%)")
 
 
 if __name__ == "__main__":

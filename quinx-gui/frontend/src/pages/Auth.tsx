@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
-import { Terminal } from 'lucide-react';
+import logo from '../assets/logo/q__2_-removebg-preview.png';
 
 export default function Auth() {
  const [isLogin, setIsLogin] = useState(true);
@@ -44,15 +44,15 @@ export default function Auth() {
     <div className="absolute top-0 left-0 w-full h-1 bg-matrix"></div>
     <div className="p-6 border-b border-divider flex justify-between items-center bg-obsidian">
      <h2 className="text-xl font-bold font-mono text-white tracking-tight flex items-center gap-2">
-      <Terminal className="w-5 h-5 text-matrix" />
-      QUINX_AI // {isLogin ? 'LOGIN' : 'INIT_OPERATOR'}
+      <img src={logo} alt="Q" className="h-10 w-10 object-contain opacity-90" />
+      <span className="text-gray-500 font-mono text-sm">// {isLogin ? 'LOGIN' : 'INIT_OPERATOR'}</span>
      </h2>
     </div>
 
     <form onSubmit={handleSubmit} className="p-8 space-y-5 font-mono">
      {!isLogin && (
       <div>
-       <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Operator_Alias</label>
+       <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Your Name</label>
        <input
         type="text"
         value={name}
@@ -65,7 +65,7 @@ export default function Auth() {
      )}
 
      <div>
-      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Access_Identifier (Email)</label>
+      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Email</label>
       <input
        type="email"
        value={email}
@@ -77,7 +77,7 @@ export default function Auth() {
      </div>
 
      <div>
-      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Security_Key</label>
+      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Password</label>
       <input
        type="password"
        value={password}
@@ -97,13 +97,13 @@ export default function Auth() {
       disabled={loading}
       className="w-full bg-matrix hover:bg-matrix-hover text-obsidian font-bold font-mono py-3 rounded-none transition-colors mt-8 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed group-hover:shadow-[0_0_15px_rgba(0,255,65,0.2)]"
      >
-      {loading ? 'AUTHENTICATING...' : isLogin ? 'EXECUTE_LOGIN()' : 'DEPLOY_ACCOUNT()'}
+      {loading ? 'Please wait...' : isLogin ? 'Log In' : 'Create Account'}
      </button>
 
      <div className="text-center pt-6 text-xs text-gray-500">
-      {isLogin ? "No clearance? " : "Clearance verified? "}
+      {isLogin ? "Don't have an account? " : "Already have an account? "}
       <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-matrix font-medium hover:underline focus:outline-none">
-       {isLogin ? "Request Access" : "Authenticate"}
+       {isLogin ? "Sign up" : "Log in"}
       </button>
      </div>
     </form>

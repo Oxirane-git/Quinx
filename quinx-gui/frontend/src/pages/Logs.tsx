@@ -52,9 +52,9 @@ export default function Logs() {
     <div>
      <div className="flex items-center space-x-3 mb-2">
       <Database className="w-6 h-6 text-matrix" />
-      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">DATASTORE_LOGS</h1>
+      <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">Logs</h1>
      </div>
-     <p className="text-gray-400 text-sm pl-9">Global audit of all historical routines.</p>
+     <p className="text-gray-400 text-sm pl-9">All your campaigns and their downloadable files.</p>
     </div>
     <div className="flex gap-4 font-mono font-bold tracking-wider">
      <button
@@ -63,7 +63,7 @@ export default function Logs() {
       className="bg-gunmetal border border-divider hover:border-matrix hover:bg-matrix/5 text-white hover:text-matrix px-5 py-2.5 text-xs flex gap-2 items-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(0,0,0,0.5)]"
      >
       <Download className="w-4 h-4" />
-      EXPORT_DUMP
+      Export CSV
      </button>
      <button
       onClick={deleteAll}
@@ -71,7 +71,7 @@ export default function Logs() {
       className="bg-gunmetal border border-red-500/30 hover:border-red-500 hover:bg-red-900/20 text-red-500 px-5 py-2.5 text-xs flex gap-2 items-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(0,0,0,0.5)]"
      >
       <Trash2 className="w-4 h-4" />
-      PURGE_ALL()
+      Delete All
      </button>
     </div>
    </header>
@@ -80,21 +80,21 @@ export default function Logs() {
     <table className="w-full text-left text-sm whitespace-nowrap text-white font-mono">
      <thead className="uppercase text-[10px] text-gray-500 border-b border-divider bg-obsidian sticky top-0 z-10 shadow-sm">
       <tr>
-       <th className="p-4 font-bold tracking-wider">NODE_ID</th>
-       <th className="p-4 font-bold tracking-wider">ROUTINE_ALIAS</th>
-       <th className="p-4 font-bold tracking-wider">INDUSTRY_VECTOR</th>
-       <th className="p-4 font-bold tracking-wider">LIFECYCLE</th>
-       <th className="p-4 font-bold tracking-wider">DEPLOYED_AT</th>
-       <th className="p-4 font-bold tracking-wider">LEADS.XLSX</th>
-       <th className="p-4 font-bold tracking-wider">PAYLOADS.XLSX</th>
+       <th className="p-4 font-bold tracking-wider">#</th>
+       <th className="p-4 font-bold tracking-wider">Campaign</th>
+       <th className="p-4 font-bold tracking-wider">Niche</th>
+       <th className="p-4 font-bold tracking-wider">Status</th>
+       <th className="p-4 font-bold tracking-wider">Created</th>
+       <th className="p-4 font-bold tracking-wider">Leads</th>
+       <th className="p-4 font-bold tracking-wider">Emails</th>
        <th className="p-4 font-bold tracking-wider"></th>
       </tr>
      </thead>
      <tbody className="divide-y divide-divider/50 text-xs border-t-2 border-matrix/50">
       {loading ? (
-       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">Contacting datastore...</td></tr>
+       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">Loading...</td></tr>
       ) : campaigns.length === 0 ? (
-       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">No persistent states recorded.</td></tr>
+       <tr><td colSpan={8} className="p-8 text-gray-500 italic text-center">No campaigns yet.</td></tr>
       ) : campaigns.map(c => (
        <tr key={c.id} className="hover:bg-obsidian transition-colors group">
         <td className="p-4 text-gray-500 font-bold tracking-wider">#{String(c.id).padStart(4, '0')}</td>
@@ -112,7 +112,7 @@ export default function Logs() {
            onClick={() => api.download(`/api/campaigns/${c.id}/download/leads`, `${c.name}_leads.xlsx`)}
            className="text-gray-400 text-[10px] uppercase font-bold tracking-wider border border-divider bg-obsidian px-2 py-1 hover:border-matrix hover:text-matrix transition-colors flex items-center gap-1 w-max"
           >
-           <span>RAW</span> <Download className="w-3 h-3" />
+           <span>Download</span> <Download className="w-3 h-3" />
           </button>
          ) : <span className="text-gray-700 text-xs">—</span>}
         </td>
@@ -122,7 +122,7 @@ export default function Logs() {
            onClick={() => api.download(`/api/campaigns/${c.id}/download/emails`, `${c.name}_emails.xlsx`)}
            className="text-gray-400 text-[10px] uppercase font-bold tracking-wider border border-divider bg-obsidian px-2 py-1 hover:border-matrix hover:text-matrix transition-colors flex items-center gap-1 w-max"
           >
-           <span>PXD</span> <Download className="w-3 h-3" />
+           <span>Download</span> <Download className="w-3 h-3" />
           </button>
          ) : <span className="text-gray-700 text-xs">—</span>}
         </td>
