@@ -56,12 +56,12 @@ def save_campaign_config(config: CampaignConfig, current_user: User = Depends(ge
     return {"ok": True}
 
 
-@router.delete("/{filename}")
+@router.delete("/config/{filename}")
 def delete_campaign_config(filename: str, current_user: User = Depends(get_current_user)):
     safe = filename.strip().replace('/', '').replace('\\', '').replace('..', '')
     path = os.path.join(CONFIGS_DIR, f"{safe}.json")
     if not os.path.exists(path):
-        raise HTTPException(status_code=404, detail="Campaign not found")
+        raise HTTPException(status_code=404, detail="Campaign config not found")
     os.remove(path)
     return {"ok": True}
 
