@@ -1,6 +1,9 @@
 <p align="center">
   <img src="quinx-gui/frontend/src/assets/hero.png" alt="Quinx AI GUI Dashboard" width="700"/>
 </p>
+<p align="center">
+  <img src="https://via.placeholder.com/800x400/0A0A0B/00FF41?text=EXTERNAL_LANDING_TERMINAL" alt="Quinx AI Interface Mode" width="700"/>
+</p>
 
 <h1 align="center">Quinx AI</h1>
 
@@ -74,6 +77,20 @@ You save:            ~$8,000+/year
 ```
 
 > **Note:** Quinx only costs the API usage fees you'd pay anyway — Google Maps API (~$0.01/search), OpenRouter (~$0.001/email), and your own SMTP server.
+
+---
+
+## 🎛️ Technical-Noir Aesthetics
+
+Quinx abandons soft, playful "SaaS" UI designs in favor of an **Obsidian and Matrix Technical-Noir** aesthetic. Built for operators focused on speed, the interface mirrors an industrial-grade terminal system.
+
+<p align="center">
+  <img src="https://via.placeholder.com/800x300/161618/00FF41?text=STDOUT_LOG_STREAM_EMULATION" alt="Quinx AI Logs" width="700"/>
+</p>
+
+* **Terminal-Based Landing**: The public-facing module (`/`) renders an autonomous terminal directly in the browser.
+* **Pitch-Black Bento Grids**: High-contrast, sharp-cornered modules structure data with extreme clarity.
+* **Live STDOUT Emulation**: Asynchronous background operations stream raw execution data directly into your dashboard as it happens, with precise `[INFO]`, `[SUCCESS]`, and `[ERROR]` console outputs.
 
 ---
 
