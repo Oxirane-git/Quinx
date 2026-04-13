@@ -52,7 +52,7 @@ export default function Scraper() {
      <p className="text-gray-400 text-sm pl-9">Enter a niche and cities to scrape verified business emails.</p>
     </header>
 
-    <form onSubmit={handleSubmit} className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+    <form onSubmit={handleSubmit} className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative rounded-lg">
      <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
 
      <div className="space-y-4 font-mono">
@@ -62,7 +62,7 @@ export default function Scraper() {
         type="text"
         value={campaignName}
         onChange={e => setCampaignName(e.target.value)}
-        className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
         placeholder="e.g. Austin_CoffeeShops_May"
        />
       </div>
@@ -72,7 +72,7 @@ export default function Scraper() {
         type="text"
         value={niche}
         onChange={e => setNiche(e.target.value)}
-        className="w-full bg-black border border-zinc-800 rounded-none p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
         placeholder="e.g. Coffee Shops"
         required
        />
@@ -82,7 +82,7 @@ export default function Scraper() {
        <textarea
         value={cities}
         onChange={e => setCities(e.target.value)}
-        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white resize-none h-24"
+        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white resize-none h-24 rounded-lg"
         placeholder="Austin, Chicago, Miami..."
         required
        />
@@ -94,7 +94,7 @@ export default function Scraper() {
         value={leadLimit}
         onChange={e => setLeadLimit(Number(e.target.value))}
         max="500"
-        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg"
        />
       </div>
      </div>
@@ -103,7 +103,7 @@ export default function Scraper() {
       <button
        disabled={isRunning}
        type="submit"
-       className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
+       className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2 rounded-lg"
       >
        <ExternalLink className="w-4 h-4" />
        {isRunning ? 'Scraping...' : 'Start Scraping'}
@@ -112,7 +112,7 @@ export default function Scraper() {
        <button
         type="button"
         onClick={stopScrape}
-        className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
+        className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors rounded-lg"
        >
         SIGKILL
        </button>
@@ -123,7 +123,7 @@ export default function Scraper() {
       <button
        type="button"
        onClick={() => api.download(`/api/campaigns/${downloadId}/download/leads`, `${downloadName}_leads.xlsx`)}
-       className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2"
+       className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2 rounded-lg"
       >
        <Download className="w-4 h-4" />
        Download Leads (.xlsx)
@@ -132,7 +132,7 @@ export default function Scraper() {
     </form>
    </div>
 
-   <div className="flex-1 bg-obsidian border border-divider flex flex-col shadow-2xl relative overflow-hidden bento-hover group">
+   <div className="flex-1 bg-obsidian border border-divider flex flex-col shadow-2xl relative overflow-hidden bento-hover group rounded-lg">
     <div className={`absolute top-0 left-0 w-full h-1 ${isRunning ? 'bg-matrix animate-pulse shadow-[0_0_15px_rgba(0,255,65,0.5)]' : 'bg-gray-800'}`}></div>
 
     <div className="p-4 border-b border-divider bg-gunmetal/80 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500">

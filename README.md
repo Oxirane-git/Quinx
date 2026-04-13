@@ -340,5 +340,5 @@ This project is private. All rights reserved.
 ---
 
 <p align="center">
-  Built by <strong>Quinx</strong>
+  Built by <a href="https://github.com/Oxirane-git"><strong>Oxirane-git</strong></a>
 </p>

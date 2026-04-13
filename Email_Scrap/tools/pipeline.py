@@ -214,7 +214,7 @@ def main():
 
     # Step 3: Build CSV
     print(f"\n-- Step 3 / 4 - Building CSV --", flush=True)
-    rc = run([python, "tools/build_leads_csv.py", "--niche", niche])
+    rc = run([python, "tools/build_leads_csv.py", "--niche", niche, "--exclude-leads-dir", "__none__"])
     if rc != 0:
         print(f"[ERROR] CSV build failed (exit {rc}). Check logs above.", flush=True)
         sys.exit(1)

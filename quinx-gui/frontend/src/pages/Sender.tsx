@@ -69,7 +69,7 @@ export default function Sender() {
           <p className="text-gray-400 text-sm pl-9">Choose a campaign and email account, then send.</p>
         </header>
 
-        <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+        <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative rounded-lg">
           <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
 
           <div className="space-y-5 font-mono">
@@ -78,7 +78,7 @@ export default function Sender() {
               <select
                 value={campaignId}
                 onChange={e => setCampaignId(e.target.value ? Number(e.target.value) : '')}
-                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-lg appearance-none"
               >
                 <option value="">-- Select a campaign --</option>
                 {campaigns.map(c => (
@@ -91,7 +91,7 @@ export default function Sender() {
               <select
                 value={accountId}
                 onChange={e => setAccountId(e.target.value ? Number(e.target.value) : '')}
-                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-lg appearance-none"
               >
                 <option value="">-- Select an email account --</option>
                 {accounts.map(a => (
@@ -105,31 +105,31 @@ export default function Sender() {
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">From (lead #)</label>
-                <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
               <div className="flex-1">
                 <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">To (lead #)</label>
-                <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
             </div>
-            <div className="flex gap-4 bg-black border border-zinc-800 p-4 shadow-inner">
+            <div className="flex gap-4 bg-black border border-zinc-800 p-4 shadow-inner rounded-lg">
               <div className="flex-1">
                 <label className="text-[10px] font-bold text-matrix block mb-2 tracking-wider uppercase">Min Delay (s)</label>
-                <input type="number" value={minDelay} onChange={e => setMinDelay(Number(e.target.value))} className="w-full bg-gunmetal border border-divider p-2 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={minDelay} onChange={e => setMinDelay(Number(e.target.value))} className="w-full bg-gunmetal border border-divider p-2 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
               <div className="flex-1">
                 <label className="text-[10px] font-bold text-matrix block mb-2 tracking-wider uppercase">Max Delay (s)</label>
-                <input type="number" value={maxDelay} onChange={e => setMaxDelay(Number(e.target.value))} className="w-full bg-gunmetal border border-divider p-2 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={maxDelay} onChange={e => setMaxDelay(Number(e.target.value))} className="w-full bg-gunmetal border border-divider p-2 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
             </div>
-            {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-none mt-2">ERR: {error}</p>}
+            {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-lg mt-2">ERR: {error}</p>}
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-divider font-mono">
             <button
               disabled={running || !campaignId || !accountId}
               onClick={handleDispatch}
-              className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
+              className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2 rounded-lg"
             >
               <Send className="w-4 h-4" />
               {running ? 'Sending...' : 'Send Emails'}
@@ -137,7 +137,7 @@ export default function Sender() {
             {running && (
               <button
                 onClick={stopDispatch}
-                className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
+                className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors rounded-lg"
               >
                 SIGKILL
               </button>
@@ -149,7 +149,7 @@ export default function Sender() {
       {/* Right panel — log + progress */}
       <div className="flex-1 flex flex-col gap-0 shadow-2xl">
         {/* Terminal */}
-        <div className="flex-1 bg-black border border-zinc-800 flex flex-col relative overflow-hidden bento-hover">
+        <div className="flex-1 bg-black border border-zinc-800 flex flex-col relative overflow-hidden bento-hover rounded-t-lg">
           <div className={`absolute top-0 left-0 w-full h-1 ${running ? 'bg-matrix animate-pulse shadow-[0_0_15px_rgba(0,255,65,0.5)]' : 'bg-gray-800'}`}></div>
 
           <div className="p-4 border-b border-divider bg-gunmetal/80 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500">
@@ -189,7 +189,7 @@ export default function Sender() {
 
         {/* Progress bar — below terminal */}
         {(running || activeStep === 4) && (
-          <div className="border border-t-0 border-zinc-800 bg-gunmetal/80 px-5 py-4 space-y-3 font-mono flex-shrink-0">
+          <div className="border border-t-0 border-zinc-800 bg-gunmetal/80 px-5 py-4 space-y-3 font-mono flex-shrink-0 rounded-b-lg">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-gray-500 uppercase tracking-widest">Dispatch Progress</span>
               {activeStep === 4

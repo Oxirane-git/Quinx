@@ -97,7 +97,7 @@ const Campaign = () => {
                 <textarea
                     rows={5}
                     placeholder={placeholder}
-                    className="bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors resize-none font-mono"
+                    className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors resize-none font-mono"
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 />
@@ -105,7 +105,7 @@ const Campaign = () => {
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="bg-black border border-zinc-800 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors font-mono"
+                    className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-matrix focus:ring-1 focus:ring-matrix transition-colors font-mono"
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 />
@@ -129,7 +129,7 @@ const Campaign = () => {
             <div className="grid grid-cols-12 gap-6 flex-1 min-h-0">
 
                 {/* Left: campaign list */}
-                <div className="col-span-4 bg-gunmetal border border-divider rounded-none flex flex-col overflow-hidden bento-hover">
+                <div className="col-span-4 bg-gunmetal border border-divider rounded-lg flex flex-col overflow-hidden bento-hover">
                     <div className="h-1 bg-matrix w-full flex-shrink-0" />
                     <div className="px-5 py-4 border-b border-divider flex items-center justify-between flex-shrink-0 bg-obsidian">
                         <span className="text-xs font-bold font-mono text-gray-400 tracking-wider">Saved Campaigns</span>
@@ -176,7 +176,7 @@ const Campaign = () => {
                 </div>
 
                 {/* Right: form */}
-                <div className="col-span-8 bg-gunmetal border border-divider rounded-none flex flex-col overflow-hidden bento-hover">
+                <div className="col-span-8 bg-gunmetal border border-divider rounded-lg flex flex-col overflow-hidden bento-hover">
                     <div className="px-6 py-5 border-b border-divider flex items-center justify-between flex-shrink-0 bg-obsidian">
                         <h2 className="text-sm font-bold font-mono text-white uppercase flex items-center gap-2">
                             <span className="w-2 h-2 bg-matrix"></span>
@@ -219,7 +219,7 @@ const Campaign = () => {
 
                                 {field('Pricing', 'pricing', 'input', 'e.g. ₹3,999/month or $99/month')}
 
-                                <div className="bg-black border border-zinc-800 rounded-none p-5 text-xs text-gray-400 space-y-2 font-mono mt-8">
+                                <div className="bg-black border border-zinc-800 rounded-lg p-5 text-xs text-gray-400 space-y-2 font-mono mt-8">
                                     <p className="text-matrix font-bold mb-3 uppercase flex items-center gap-2">
                                         <ChevronRight className="w-4 h-4" /> How the AI uses these fields:
                                     </p>
@@ -238,7 +238,7 @@ const Campaign = () => {
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className={`w-full py-4 rounded-none text-sm font-mono font-bold flex justify-center items-center space-x-2 transition-all group
+                                    className={`w-full py-4 rounded-lg text-sm font-mono font-bold flex justify-center items-center space-x-2 transition-all group
                                         ${saving
                                             ? 'bg-gunmetal text-gray-600 cursor-not-allowed border border-divider'
                                             : 'bg-matrix text-obsidian hover:bg-matrix-hover shadow-[0_0_15px_rgba(0,255,65,0.1)] hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]'

@@ -88,7 +88,7 @@ export default function Writer() {
           <p className="text-gray-400 text-sm pl-9">AI writes a personalised email for each lead using your campaign details.</p>
         </header>
 
-        <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative">
+        <div className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative rounded-lg">
           <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
           <div className="space-y-4 font-mono">
             <div>
@@ -96,7 +96,7 @@ export default function Writer() {
               <select
                 value={selectedCampaign}
                 onChange={e => handleCampaignChange(e.target.value ? Number(e.target.value) : '')}
-                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-none appearance-none"
+                className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-lg appearance-none"
               >
                 <option value="">-- Select a campaign --</option>
                 {campaigns.map(c => (
@@ -111,17 +111,17 @@ export default function Writer() {
                 value={campaignConfig}
                 onChange={e => setCampaignConfig(e.target.value)}
                 placeholder="e.g. default_offer"
-                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none"
+                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg"
               />
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">From (lead #)</label>
-                <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={fromLead} onChange={e => setFromLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
               <div className="flex-1">
                 <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">To (lead #)</label>
-                <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-none" />
+                <input type="number" value={toLead} onChange={e => setToLead(Number(e.target.value))} className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white rounded-lg" />
               </div>
             </div>
             <div>
@@ -146,14 +146,14 @@ export default function Writer() {
               <span className="tracking-wider uppercase text-gray-500">Estimated AI Cost:</span>
               <span className="text-xl font-bold text-matrix tracking-normal">${estimatedCost}</span>
             </div>
-            {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-none mt-2">ERR: {error}</p>}
+            {error && <p className="text-red-500 text-xs border border-red-500/30 bg-red-900/10 px-4 py-3 tracking-wide rounded-lg mt-2">ERR: {error}</p>}
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-divider font-mono">
             <button
               disabled={running || !selectedCampaign}
               onClick={handleStart}
-              className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2"
+              className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2 rounded-lg"
             >
               <Send className="w-4 h-4" />
               {running ? 'Writing...' : 'Start Writing'}
@@ -161,7 +161,7 @@ export default function Writer() {
             {running && (
               <button
                 onClick={stopWriting}
-                className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors"
+                className="px-6 py-3 text-sm font-bold border border-red-500/50 text-red-500 bg-red-900/10 hover:bg-red-500 hover:text-white transition-colors rounded-lg"
               >
                 SIGKILL
               </button>
@@ -172,7 +172,7 @@ export default function Writer() {
             <button
               type="button"
               onClick={() => api.download(`/api/campaigns/${downloadId}/download/emails`, `campaign_${downloadId}_emails.xlsx`)}
-              className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2"
+              className="w-full mt-4 py-3 border border-matrix text-matrix bg-matrix/5 text-xs font-bold font-mono tracking-wider hover:bg-matrix hover:text-obsidian transition-all flex items-center justify-center gap-2 rounded-lg"
             >
               <Download className="w-4 h-4" />
               Download Emails (.xlsx)
@@ -183,7 +183,7 @@ export default function Writer() {
 
       <div className="flex-1 flex flex-col gap-6 h-[calc(100vh-6rem)]">
         {/* Leads table */}
-        <div className="bg-gunmetal border border-divider flex-1 overflow-auto bento-hover shadow-lg">
+        <div className="bg-gunmetal border border-divider flex-1 overflow-auto bento-hover shadow-lg rounded-lg">
           <div className="p-4 border-b border-divider bg-obsidian flex items-center justify-between font-mono text-xs uppercase tracking-widest text-gray-500 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-matrix/10 to-transparent"></div>
             <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export default function Writer() {
                   <td className="p-4 text-gray-400">{lead.email}</td>
                   <td className="p-4 text-gray-500">{lead.city}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 ${lead.status === 'written' ? 'text-matrix bg-matrix/10 border border-matrix/20' : 'text-gray-500 bg-black border border-zinc-800'}`}>
+                    <span className={`px-2 py-1 rounded ${lead.status === 'written' ? 'text-matrix bg-matrix/10 border border-matrix/20' : 'text-gray-500 bg-black border border-zinc-800'}`}>
                       {lead.status?.toUpperCase() || 'PENDING_EVAL'}
                     </span>
                   </td>
@@ -223,7 +223,7 @@ export default function Writer() {
         </div>
 
         {/* Log panel */}
-        <div className="bg-black border border-zinc-800 flex flex-col shadow-lg relative bento-hover flex-shrink-0" style={{ height: (running || activeStep === 4) ? '11rem' : '12rem' }}>
+        <div className="bg-black border border-zinc-800 flex flex-col shadow-lg relative bento-hover flex-shrink-0 rounded-lg overflow-hidden" style={{ height: (running || activeStep === 4) ? '11rem' : '12rem' }}>
           <div className="p-2 border-b border-divider bg-gunmetal font-mono text-[10px] uppercase text-gray-500 tracking-widest pl-4 flex items-center justify-between flex-shrink-0">
             <span>Live Output</span>
             {running && <span className="text-matrix animate-pulse text-[10px]">RUNNING...</span>}
@@ -242,7 +242,7 @@ export default function Writer() {
 
         {/* Progress bar — below log */}
         {(running || activeStep === 4) && (
-          <div className="bg-gunmetal/80 border border-divider px-5 py-4 space-y-3 font-mono flex-shrink-0">
+          <div className="bg-gunmetal/80 border border-divider px-5 py-4 space-y-3 font-mono flex-shrink-0 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-gray-500 uppercase tracking-widest">Generation Progress</span>
               {activeStep === 4

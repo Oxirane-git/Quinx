@@ -43,6 +43,7 @@ export default function Sidebar() {
     <div className="p-6 border-b border-divider bg-gunmetal">
      <div className="flex items-center gap-3">
       <img src={logo} alt="Q" className="h-10 w-10 object-contain opacity-90" />
+      <span className="font-mono font-bold text-lg text-white tracking-tight">Quinx</span>
      </div>
     </div>
 
@@ -52,7 +53,7 @@ export default function Sidebar() {
        key={item.name}
        to={item.path}
        className={clsx(
-        "w-full flex items-center gap-3 px-4 py-3 text-sm transition-all font-mono font-bold tracking-tight rounded-none",
+        "w-full flex items-center gap-3 px-4 py-3 text-sm transition-all font-mono font-bold tracking-tight rounded-lg",
         location.pathname === item.path
          ? "bg-matrix/5 text-matrix border-l-2 border-matrix"
          : "text-gray-500 hover:text-pure-white hover:bg-gunmetal border-l-2 border-transparent"
@@ -78,10 +79,10 @@ export default function Sidebar() {
        <span className="text-gray-500">Loading_Limits...</span>
       )}
      </div>
-     <Link to="/settings" className="p-2 text-gray-400 text-sm hover:text-matrix border border-transparent hover:border-divider hover:bg-obsidian transition-colors rounded-none">
+     <Link to="/settings" className="p-2 text-gray-400 text-sm hover:text-matrix border border-transparent hover:border-divider hover:bg-obsidian transition-colors rounded-lg">
       <Settings size={16} />
      </Link>
-     <button onClick={handleLogout} className="p-2 text-gray-400 text-sm hover:text-red-500 border border-transparent hover:border-divider hover:bg-obsidian transition-colors rounded-none">
+     <button onClick={handleLogout} className="p-2 text-gray-400 text-sm hover:text-red-500 border border-transparent hover:border-divider hover:bg-obsidian transition-colors rounded-lg">
       <LogOut size={16} />
      </button>
     </div>

@@ -59,7 +59,7 @@ export default function Settings() {
 
    <div className="space-y-8 font-mono">
     {/* Email Accounts */}
-    <section className="bg-gunmetal shadow-2xl border border-divider p-8 rounded-none relative overflow-hidden bento-hover">
+    <section className="bg-gunmetal shadow-2xl border border-divider p-8 rounded-lg relative overflow-hidden bento-hover">
      <div className="absolute top-0 right-0 w-32 h-32 bg-matrix/5 rounded-bl-[100px] pointer-events-none"></div>
      <h2 className="text-lg font-bold mb-6 flex items-center gap-3 tracking-wider uppercase">
       <Mail className="w-5 h-5 text-matrix" />
@@ -134,7 +134,7 @@ export default function Settings() {
     </section>
 
     {/* API Spend */}
-    <section className="bg-gunmetal shadow-2xl border border-divider p-8 rounded-none relative overflow-hidden bento-hover">
+    <section className="bg-gunmetal shadow-2xl border border-divider p-8 rounded-lg relative overflow-hidden bento-hover">
      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-[100px] pointer-events-none"></div>
      <h2 className="text-lg font-bold mb-6 flex items-center gap-3 tracking-wider uppercase">
       <Cpu className="w-5 h-5 text-blue-400" />

@@ -17,6 +17,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logo} alt="Q" className="h-11 w-11 object-contain opacity-90" />
+            <span className="font-mono font-bold text-xl text-white tracking-tight">Quinx</span>
           </div>
           <div className="flex space-x-4">
             <button
@@ -50,7 +51,7 @@ const LandingPage = () => {
           </p>
           <button
             onClick={() => navigate('/scraper')}
-            className="group flex items-center space-x-3 bg-matrix text-obsidian font-mono font-bold px-8 py-4 hover:bg-matrix-hover transition-colors rounded-none cursor-pointer"
+            className="group flex items-center space-x-3 bg-matrix text-obsidian font-mono font-bold px-8 py-4 hover:bg-matrix-hover transition-colors rounded-lg cursor-pointer"
           >
             <span>START FOR FREE</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
