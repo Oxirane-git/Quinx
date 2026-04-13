@@ -70,3 +70,4 @@ playwright-report/
 
 # ----- Build artifacts -----
 quinx-gui/frontend/dist/
+.claude/
