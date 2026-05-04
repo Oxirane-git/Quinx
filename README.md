@@ -14,11 +14,7 @@
   <img src="https://img.shields.io/badge/node.js-18+-green?logo=node.js&logoColor=white" alt="Node.js"/>
   <img src="https://img.shields.io/badge/react-19-61DAFB?logo=react&logoColor=black" alt="React"/>
   <img src="https://img.shields.io/badge/fastapi-0.110+-009688?logo=fastapi&logoColor=white" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License"/>
-</p>
-
-<p align="center">
-  <img src="quinx-gui/frontend/src/assets/hero.png" alt="Quinx Dashboard" width="700"/>
+  <img src="https://img.shields.io/badge/license-private-lightgrey" alt="License"/>
 </p>
 
 ---
@@ -100,6 +96,7 @@ Quinx/
 ├── Email_Sender/            # Step 4: Email delivery
 │   ├── src/
 │   │   ├── index.js                 # Sender entry point (called by GUI)
+│   │   ├── hostinger.js             # SMTP send + IMAP Sent-folder sync
 │   │   └── ...
 │   └── .env.example
 ├── quinx-gui/               # GUI Control Panel (primary interface)
@@ -162,7 +159,7 @@ graph LR
 | **1. Campaign** | Define service name, pitch, context, pricing, your name — saved as a reusable JSON | React form, FastAPI file store |
 | **2. Scrape** | Search Google Maps → scrape websites for emails → store in SQLite + XLSX. Stops as soon as the target email count is hit (`--max-emails N`) | Google Places API, BeautifulSoup, Regex |
 | **3. Write** | Load leads → AI reads each website → writes a personalised email per lead → saves emails XLSX | OpenRouter (key rotation, multi-model) + Anthropic backup |
-| **4. Send** | Load emails → send via SMTP with human-like random delays between each | Hostinger SMTP :465 |
+| **4. Send** | Load emails → send via SMTP with human-like random delays → copy to Sent folder via IMAP | Hostinger SMTP :465, IMAP :993 |
 | **5. Logs** | Browse all campaigns, download leads/emails XLSX, delete campaigns | SQLite, FastAPI, openpyxl |
 
 Each step runs as a **background thread** — the GUI polls every 2 seconds and streams live logs. Every step has a **Stop** button and a **progress bar**. Navigating away from a page mid-run does not stop the process — job state is kept alive in React Context providers.
@@ -212,7 +209,11 @@ npm install
 
 ### 4. Start
 
-Open **two terminals**:
+**Option A — One click (Windows):**
+
+Double-click `run_quinx.bat` in the repo root. It opens the backend and frontend in separate terminal windows automatically.
+
+**Option B — Manual:**
 
 ```bash
 # Terminal 1 — Backend (FastAPI on :8001)
@@ -296,6 +297,7 @@ The AI writer enforces strict rules on every email:
 ## Safety Features
 
 - **Human-like delays** — Configurable min/max delay (seconds) between emails
+- **Sent folder sync** — Every sent email is copied to your Hostinger Sent folder via IMAP so your mailbox stays in sync
 - **Exact email targeting** — `--max-emails N` stops scraping as soon as N valid emails are found
 - **API key rotation** — Auto-rotates OpenRouter keys on rate limits, falls back to Anthropic
 - **Email validation** — AI output validated and auto-retried before saving
@@ -311,7 +313,7 @@ Quinx uses **SQLite** — no setup required:
 | Table | Purpose |
 |-------|---------|
 | `campaigns` | Name, niche, status, timestamps |
-| `leads` | Scraped contacts linked to campaigns |
+| `leads` | Scraped contacts — name, email, phone, website, city, category, niche, owner |
 | `email_accounts` | SMTP credentials (encrypted) |
 | `users` | Account info, API spend tracking |
 
@@ -325,7 +327,7 @@ XLSX exports are stored in `quinx-gui/backend/exports/` as `{id}_leads.xlsx` and
 |-------|-----------|
 | **Lead Scraping** | Python, Google Maps Places API, BeautifulSoup, Regex |
 | **Email Writing** | Python, OpenRouter (multi-model, key rotation), Anthropic, openpyxl |
-| **Email Sending** | Node.js, Nodemailer, Hostinger SMTP :465 |
+| **Email Sending** | Node.js, Nodemailer (SMTP :465), IMAP (:993) for Sent-folder sync |
 | **GUI Backend** | FastAPI, SQLAlchemy, SQLite, threading |
 | **GUI Frontend** | React 19, Vite, Tailwind CSS v3, TypeScript, React Router |
 | **State Management** | React Context (ScraperProvider, WriterProvider, SenderProvider) |
