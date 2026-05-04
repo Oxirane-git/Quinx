@@ -25,7 +25,7 @@ async function main() {
 
     try {
         const transporter = await createTransport(email, password);
-        await sendAllEmails(transporter, email, leads);
+        await sendAllEmails(transporter, email, leads, password);
     } catch (err) {
         logger.error(`Fatal error: ${err.message}`);
         process.exit(1);

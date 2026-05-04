@@ -49,7 +49,12 @@ class Lead(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     business_name = Column(String)
     email = Column(String)
+    phone = Column(String)
+    website = Column(String)
     city = Column(String)
+    category = Column(String)
+    niche = Column(String)
+    owner_name = Column(String)
     status = Column(String, default="scraped")
     
     user = relationship("User", back_populates="leads")

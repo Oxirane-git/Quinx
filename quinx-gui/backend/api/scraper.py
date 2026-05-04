@@ -8,7 +8,7 @@ import csv
 import re
 import openpyxl
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List
 from sqlalchemy.orm import Session
@@ -30,7 +30,8 @@ class ScraperConfig(BaseModel):
     niche: str
     cities: List[str]
     lead_limit: int = 60
-    campaign_name: str
+    campaign_name: str = ""
+    campaign_id: int = None
 
 
 def _run_scrape(job_id: str, user_id: int, niche: str, cities: list, lead_limit: int, campaign_id: int):
@@ -104,7 +105,12 @@ def _run_scrape(job_id: str, user_id: int, niche: str, cities: list, lead_limit:
                                 user_id=user_id,
                                 business_name=row.get('business_name', ''),
                                 email=row['email'].strip(),
+                                phone=row.get('phone', ''),
+                                website=row.get('website', ''),
                                 city=row.get('city', ''),
+                                category=row.get('category', '') or niche,
+                                niche=row.get('niche', '') or niche,
+                                owner_name=row.get('owner_name', '') or f"{row.get('business_name', '')}'s Team",
                                 status='scraped'
                             ))
                             leads_data.append(row)
@@ -115,12 +121,33 @@ def _run_scrape(job_id: str, user_id: int, niche: str, cities: list, lead_limit:
 
         # Save XLSX export
         out_path = os.path.join(EXPORTS_DIR, f"{campaign_id}_leads.xlsx")
+        
+        # Build combined XLSX from DB
+        all_leads = []
+        db = SessionLocal()
+        try:
+            db_leads = db.query(Lead).filter(Lead.campaign_id == campaign_id).all()
+            for l in db_leads:
+                all_leads.append({
+                    'business_name': l.business_name,
+                    'email': l.email,
+                    'phone': l.phone,
+                    'website': l.website,
+                    'city': l.city,
+                    'category': l.category,
+                    'niche': l.niche,
+                    'owner_name': l.owner_name,
+                    'status': l.status
+                })
+        finally:
+            db.close()
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Leads"
-        headers = ['business_name', 'email', 'phone', 'website', 'city', 'category', 'niche']
+        headers = ['business_name', 'email', 'phone', 'website', 'city', 'category', 'niche', 'owner_name', 'status']
         ws.append(headers)
-        for row in leads_data:
+        for row in all_leads:
             ws.append([row.get(h, '') for h in headers])
         wb.save(out_path)
 
@@ -142,19 +169,29 @@ def start_scraper_task(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    new_campaign = Campaign(user_id=current_user.id, name=config.campaign_name, niche=config.niche)
-    db.add(new_campaign)
-    db.commit()
-    db.refresh(new_campaign)
+    if config.campaign_id:
+        campaign = db.query(Campaign).filter(
+            Campaign.id == config.campaign_id,
+            Campaign.user_id == current_user.id
+        ).first()
+        if not campaign:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+        campaign_id = campaign.id
+    else:
+        new_campaign = Campaign(user_id=current_user.id, name=config.campaign_name, niche=config.niche)
+        db.add(new_campaign)
+        db.commit()
+        db.refresh(new_campaign)
+        campaign_id = new_campaign.id
 
     job_id = str(uuid.uuid4())
     task_store.create(job_id)
 
     thread = threading.Thread(
         target=_run_scrape,
-        args=(job_id, current_user.id, config.niche, config.cities, config.lead_limit, new_campaign.id),
+        args=(job_id, current_user.id, config.niche, config.cities, config.lead_limit, campaign_id),
         daemon=True
     )
     thread.start()
 
-    return {"job_id": job_id, "campaign_id": new_campaign.id}
+    return {"job_id": job_id, "campaign_id": campaign_id}

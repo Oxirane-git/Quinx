@@ -1,8 +1,8 @@
-const { sendEmail } = require('./hostinger');
+const { sendEmail, saveToSent } = require('./hostinger');
 const { logger, randomDelay } = require('./utils');
 const { updateLeadStatus } = require('./db');
 
-async function sendAllEmails(transporter, from, leads) {
+async function sendAllEmails(transporter, from, leads, password) {
     const sendLimit = parseInt(process.env.SEND_LIMIT || '0', 10);
     const effectiveLeads = sendLimit > 0 ? leads.slice(0, sendLimit) : leads;
     const total = effectiveLeads.length;
@@ -26,6 +26,15 @@ async function sendAllEmails(transporter, from, leads) {
             const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
             logger.success(`Sent ${i + 1}/${total} → ${lead.email} (${elapsed}s)`);
+            
+            // Phase 1: Save to Sent folder
+            try {
+                await saveToSent(from, password, lead, lead.owner_name);
+            } catch (imapErr) {
+                logger.warn(`[IMAP] Could not save to Sent: ${imapErr.message}`);
+                // Don't fail the lead just because IMAP failed
+            }
+
             sent++;
             updateLeadStatus(lead.email, 'sent');
 
@@ -40,7 +49,9 @@ async function sendAllEmails(transporter, from, leads) {
 
         // Delay before the next email if this is not the last one
         if (i < total - 1) {
-            await randomDelay(10000, 15000);
+            const min = parseInt(process.env.MIN_DELAY || '10', 10) * 1000;
+            const max = parseInt(process.env.MAX_DELAY || '15', 10) * 1000;
+            await randomDelay(min, max);
         }
     }
 

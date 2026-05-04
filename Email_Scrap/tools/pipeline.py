@@ -140,8 +140,9 @@ def write_city_leads_xlsx(niche: str, cities: list, niche_slug: str, limit: int,
                 print(f"[WARN] No rows matched city '{city_arg}' — skipping.", flush=True)
                 continue
 
-        if limit:
-            city_rows = city_rows[:limit]
+        # No export cap — return all found leads
+        # if limit:
+        #     city_rows = city_rows[:limit]
 
         filename = f"{city_part}_{niche_part}_Leads.xlsx"
         output_path = os.path.join(leads_dir, filename)
@@ -206,8 +207,9 @@ def main():
 
         print(f"[SCRAPE] {city_slug} ...", flush=True)
         scrape_cmd = [python, "tools/scrape_website_emails.py", "--input", raw_file]
-        if args.limit and args.limit > 0:
-            scrape_cmd += ["--max-emails", str(args.limit)]
+        # No email cap — scrape every business found
+        # if args.limit and args.limit > 0:
+        #     scrape_cmd += ["--max-emails", str(args.limit)]
         rc = run(scrape_cmd)
         if rc != 0:
             print(f"[WARN] Scraping failed for {city_slug} (exit {rc}).", flush=True)

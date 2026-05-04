@@ -22,6 +22,10 @@ function deriveStep(logs: string[]): number {
 export default function Scraper() {
  const { logs, isRunning, downloadId, downloadName, startScrape, stopScrape } = useScraperStore();
 
+ const [mode, setMode] = useState<'new' | 'existing'>('new');
+ const [campaigns, setCampaigns] = useState<{id: number, name: string, niche: string}[]>([]);
+ const [selectedCampaignId, setSelectedCampaignId] = useState<number | ''>('');
+ 
  const [niche, setNiche] = useState('');
  const [cities, setCities] = useState('');
  const [leadLimit, setLeadLimit] = useState(60);
@@ -31,14 +35,40 @@ export default function Scraper() {
  const activeStep = isRunning ? deriveStep(logs) : (logs.some(l => l.includes('Task complete') || l.includes('SUCCESS')) ? 5 : 0);
 
  useEffect(() => {
+  api.get('/api/campaigns/').then(setCampaigns).catch(() => {});
+ }, []);
+
+ useEffect(() => {
   logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
  }, [logs]);
+
+ const handleCampaignSelect = (id: number | '') => {
+  setSelectedCampaignId(id);
+  if (!id) return;
+  const c = campaigns.find(x => x.id === id);
+  if (c) {
+    setNiche(c.niche);
+    setCampaignName(c.name);
+  }
+ };
 
  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
   e.preventDefault();
   const cityList = cities.split(',').map(c => c.trim()).filter(Boolean);
-  const name = campaignName || `${niche}_${Date.now()}`;
-  await startScrape({ niche, cities: cityList, lead_limit: leadLimit, campaign_name: name });
+  
+  const payload: any = { 
+    niche, 
+    cities: cityList, 
+    lead_limit: leadLimit 
+  };
+
+  if (mode === 'existing' && selectedCampaignId) {
+    payload.campaign_id = selectedCampaignId;
+  } else {
+    payload.campaign_name = campaignName || `${niche}_${Date.now()}`;
+  }
+
+  await startScrape(payload);
  };
 
  return (
@@ -49,30 +79,67 @@ export default function Scraper() {
       <Target className="w-6 h-6 text-matrix" />
       <h1 className="text-2xl font-bold font-mono tracking-tight uppercase">Find Leads</h1>
      </div>
-     <p className="text-gray-400 text-sm pl-9">Enter a niche and cities to scrape verified business emails.</p>
+     <p className="text-gray-400 text-sm pl-9">Search Google Maps and scrape verified emails.</p>
     </header>
 
     <form onSubmit={handleSubmit} className="bg-gunmetal border border-divider p-6 space-y-6 bento-hover relative rounded-lg">
      <div className="absolute top-0 right-0 w-16 h-16 bg-matrix/5 rounded-bl-full pointer-events-none"></div>
 
      <div className="space-y-4 font-mono">
-      <div>
-       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Campaign Name (optional)</label>
-       <input
-        type="text"
-        value={campaignName}
-        onChange={e => setCampaignName(e.target.value)}
-        className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
-        placeholder="e.g. Austin_CoffeeShops_May"
-       />
+      {/* Mode Toggle */}
+      <div className="flex p-1 bg-black rounded-lg border border-zinc-800">
+        <button
+          type="button"
+          onClick={() => setMode('new')}
+          className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all rounded ${mode === 'new' ? 'bg-matrix text-obsidian shadow-lg' : 'text-gray-500 hover:text-white'}`}
+        >
+          New Campaign
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('existing')}
+          className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all rounded ${mode === 'existing' ? 'bg-matrix text-obsidian shadow-lg' : 'text-gray-500 hover:text-white'}`}
+        >
+          Continue Existing
+        </button>
       </div>
+
+      {mode === 'existing' ? (
+        <div>
+          <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* Select Campaign</label>
+          <select
+            value={selectedCampaignId}
+            onChange={e => handleCampaignSelect(e.target.value ? Number(e.target.value) : '')}
+            className="w-full bg-black border border-zinc-800 p-3 text-sm text-white outline-none focus:border-matrix focus:ring-1 focus:ring-matrix rounded-lg appearance-none"
+            required
+          >
+            <option value="">-- Choose Campaign --</option>
+            {campaigns.map(c => (
+              <option key={c.id} value={c.id}>{c.name} ({c.niche})</option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <div>
+          <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Campaign Name (optional)</label>
+          <input
+            type="text"
+            value={campaignName}
+            onChange={e => setCampaignName(e.target.value)}
+            className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+            placeholder="e.g. Austin_CoffeeShops_May"
+          />
+        </div>
+      )}
+
       <div>
        <label className="text-xs font-bold text-matrix block mb-2 tracking-wider">* Business Type</label>
        <input
         type="text"
         value={niche}
         onChange={e => setNiche(e.target.value)}
-        className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white"
+        disabled={mode === 'existing' && !!selectedCampaignId}
+        className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-matrix focus:ring-1 focus:ring-matrix outline-none text-white disabled:opacity-50"
         placeholder="e.g. Coffee Shops"
         required
        />
@@ -88,7 +155,7 @@ export default function Scraper() {
        />
       </div>
       <div>
-       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Emails to find per city</label>
+       <label className="text-xs font-bold text-gray-500 block mb-2 tracking-wider">Lead limit per city</label>
        <input
         type="number"
         value={leadLimit}
@@ -101,7 +168,7 @@ export default function Scraper() {
 
      <div className="flex gap-3 pt-4 border-t border-divider font-mono">
       <button
-       disabled={isRunning}
+       disabled={isRunning || (mode === 'existing' && !selectedCampaignId)}
        type="submit"
        className="flex-1 py-3 text-sm font-bold transition-all bg-matrix text-obsidian hover:bg-matrix-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gunmetal disabled:text-gray-500 disabled:border-divider border border-transparent shadow-[0_0_10px_rgba(0,255,65,0.15)] flex justify-center items-center gap-2 rounded-lg"
       >
