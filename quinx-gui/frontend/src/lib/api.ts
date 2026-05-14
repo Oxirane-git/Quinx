@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8001';
+const BASE = 'http://localhost:8002';
 
 function authHeader(): Record<string, string> {
  const token = localStorage.getItem('token');
